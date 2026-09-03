@@ -1,0 +1,6 @@
+{
+  "extends": "@norma/tsconfig/lib.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
+}

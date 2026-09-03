@@ -1,0 +1,47 @@
+{
+  "name": "software-dev-jira",
+  "description": "Same pipeline as the software-dev preset, backed by Jira Cloud — only the config changes.",
+  "tracker": {
+    "kind": "jira",
+    "options": { "baseUrl": "https://your-site.atlassian.net", "projectKey": "ENG" }
+  },
+  "runtime": { "kind": "claude-code", "options": { "model": "claude-sonnet-5" } },
+  "policy": {
+    "workerTypes": ["api", "web"],
+    "concurrency": 1,
+    "escalateAtBounces": 2,
+    "satisfiedPhases": ["released", "done"],
+    "depDonePhases": ["released", "done", "canceled"]
+  },
+  "roles": {
+    "worker": { "api": "api-engineer", "web": "web-engineer" },
+    "review": "code-reviewer",
+    "qa": "qa-engineer",
+    "escalate": "principal-engineer"
+  },
+  "phaseMapping": {
+    "classify": [
+      { "when": { "state": "Backlog" }, "phase": "backlog" },
+      { "when": { "state": "To Do", "label": "ready-for-dev" }, "phase": "ready" },
+      { "when": { "state": "In Progress", "label": "changes-requested" }, "phase": "needs_rework" },
+      { "when": { "state": "In Progress" }, "phase": "in_progress" },
+      { "when": { "state": "In Review", "label": "needs-qa" }, "phase": "needs_qa" },
+      { "when": { "state": "In Review" }, "phase": "needs_review" },
+      { "when": { "state": "Ready for PR" }, "phase": "released" },
+      { "when": { "state": "Done" }, "phase": "done" },
+      { "when": { "state": "Canceled" }, "phase": "canceled" }
+    ],
+    "apply": {
+      "ready": { "state": "To Do", "addLabels": ["ready-for-dev"], "removeLabels": [] },
+      "in_progress": { "state": "In Progress", "addLabels": [], "removeLabels": ["ready-for-dev"] },
+      "needs_review": { "state": "In Review", "addLabels": ["needs-review"], "removeLabels": ["changes-requested", "needs-qa"] },
+      "needs_qa": { "state": "In Review", "addLabels": ["needs-qa"], "removeLabels": ["needs-review"] },
+      "needs_rework": { "state": "In Progress", "addLabels": ["changes-requested"], "removeLabels": ["needs-review", "needs-qa"] },
+      "released": { "state": "Ready for PR", "addLabels": ["qa-approved"], "removeLabels": ["needs-qa"] },
+      "done": { "state": "Done", "addLabels": [], "removeLabels": [] }
+    },
+    "owner": { "fromLabelPrefix": "agent:" },
+    "batch": { "fromLabelPrefix": "qa-batch:" },
+    "bounceMarker": "🔁\\s*bounce"
+  }
+}

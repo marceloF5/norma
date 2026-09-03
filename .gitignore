@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.turbo/
+*.tsbuildinfo
+coverage/
+
+# env / secrets — never commit tracker keys or agent tokens
+.env
+.env.*
+!.env.example
+
+# harness runtime artifacts
+.harness/logs/
+.harness/state/
+
+# OS
+.DS_Store
