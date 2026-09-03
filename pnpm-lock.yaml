@@ -29,38 +29,38 @@ importers:
 
   apps/cli:
     dependencies:
-      '@harness/adapter-jira':
+      '@norma/adapter-jira':
         specifier: workspace:*
         version: link:../../packages/adapter-jira
-      '@harness/adapter-linear':
+      '@norma/adapter-linear':
         specifier: workspace:*
         version: link:../../packages/adapter-linear
-      '@harness/agent-runtime':
+      '@norma/agent-runtime':
         specifier: workspace:*
         version: link:../../packages/agent-runtime
-      '@harness/config':
+      '@norma/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@harness/context':
+      '@norma/context':
         specifier: workspace:*
         version: link:../../packages/context
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@harness/orchestrator':
+      '@norma/orchestrator':
         specifier: workspace:*
         version: link:../../packages/orchestrator
-      '@harness/tracker':
+      '@norma/tracker':
         specifier: workspace:*
         version: link:../../packages/tracker
       commander:
         specifier: 12.1.0
         version: 12.1.0
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -81,14 +81,14 @@ importers:
 
   packages/adapter-jira:
     dependencies:
-      '@harness/tracker':
+      '@norma/tracker':
         specifier: workspace:*
         version: link:../tracker
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -106,14 +106,14 @@ importers:
 
   packages/adapter-linear:
     dependencies:
-      '@harness/tracker':
+      '@norma/tracker':
         specifier: workspace:*
         version: link:../tracker
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -131,14 +131,14 @@ importers:
 
   packages/agent-runtime:
     dependencies:
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -156,17 +156,17 @@ importers:
 
   packages/config:
     dependencies:
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../core
       zod:
         specifier: 3.24.1
         version: 3.24.1
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       tsup:
@@ -181,14 +181,14 @@ importers:
 
   packages/context:
     dependencies:
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -206,10 +206,10 @@ importers:
 
   packages/core:
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       tsup:
@@ -224,26 +224,26 @@ importers:
 
   packages/orchestrator:
     dependencies:
-      '@harness/agent-runtime':
+      '@norma/agent-runtime':
         specifier: workspace:*
         version: link:../agent-runtime
-      '@harness/config':
+      '@norma/config':
         specifier: workspace:*
         version: link:../config
-      '@harness/context':
+      '@norma/context':
         specifier: workspace:*
         version: link:../context
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../core
-      '@harness/tracker':
+      '@norma/tracker':
         specifier: workspace:*
         version: link:../tracker
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       '@types/node':
@@ -261,17 +261,17 @@ importers:
 
   packages/tracker:
     dependencies:
-      '@harness/config':
+      '@norma/config':
         specifier: workspace:*
         version: link:../config
-      '@harness/core':
+      '@norma/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
-      '@harness/tsconfig':
+      '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
-      '@harness/tsup-config':
+      '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
       tsup:

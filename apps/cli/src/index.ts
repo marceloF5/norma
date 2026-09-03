@@ -1,5 +1,5 @@
 import { EchoRunner } from "@norma/agent-runtime";
-import { type HarnessConfig, toPlanContext } from "@norma/config";
+import { type NormaConfig, toPlanContext } from "@norma/config";
 import { Phase, computePlan } from "@norma/core";
 import { Orchestrator } from "@norma/orchestrator";
 import { MemoryTracker, type RawIssue, applyFor, normalize } from "@norma/tracker";
@@ -15,24 +15,24 @@ interface GlobalOpts {
 
 const program = new Command();
 program
-  .name("harness")
-  .description("Harness CORE — provider-agnostic orchestration for AI agent pipelines")
+  .name("norma")
+  .description("Norma — provider-agnostic orchestration for AI agent pipelines")
   .version("0.0.0")
   .option(
     "-c, --config <path>",
-    "path to a harness config JSON (defaults to the software-dev preset)",
+    "path to a norma config JSON (defaults to the software-dev preset)",
   )
-  .option("--context-root <dir>", "root dir for durable brief/PLAN/report", ".harness")
+  .option("--context-root <dir>", "root dir for durable brief/PLAN/report", ".norma")
   .option("--tracker <kind>", "override tracker kind (linear|jira|memory)")
   .option("--runtime <kind>", "override agent runtime (claude-code|echo)");
 
-async function resolveConfig(): Promise<HarnessConfig> {
+async function resolveConfig(): Promise<NormaConfig> {
   const g = program.opts<GlobalOpts>();
   const config = await loadConfig(g.config);
   if (g.tracker)
-    config.tracker = { ...config.tracker, kind: g.tracker as HarnessConfig["tracker"]["kind"] };
+    config.tracker = { ...config.tracker, kind: g.tracker as NormaConfig["tracker"]["kind"] };
   if (g.runtime)
-    config.runtime = { ...config.runtime, kind: g.runtime as HarnessConfig["runtime"]["kind"] };
+    config.runtime = { ...config.runtime, kind: g.runtime as NormaConfig["runtime"]["kind"] };
   return config;
 }
 

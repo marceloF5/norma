@@ -1,6 +1,6 @@
 # Architecture
 
-Harness CORE is the generalized extraction of a working autonomous dev harness that ran
+Norma is the generalized extraction of a working autonomous dev harness that ran
 on Linear. This document records the design and how each original concept maps onto the
 decoupled core.
 
@@ -42,10 +42,10 @@ config (`phaseMapping`, `roles`, `policy`) or an adapter.
 | `Ready for PR` accumulation state | phase `released` (config maps it to whatever the tracker calls it) |
 | One-in-flight gate | `policy.concurrency` (default 1) |
 | Escalate after 2 bounces (`🔁 bounce` comments) | `policy.escalateAtBounces` + `phaseMapping.bounceMarker` |
-| `/dev-cycle` command (operator) | `@norma/orchestrator` + `harness cycle` |
+| `/dev-cycle` command (operator) | `@norma/orchestrator` + `norma cycle` |
 | `/epic` intake + principal-engineer decomposition | intake stays an agent concern; `TrackerAdapter.createProject/createIssue/addDependency` provide the writes |
 | PLAN.md / report.md / epic brief handoff | `@norma/context` (`ContextStore` + `composeHandoff`) |
-| Docker sandbox + launchd cron | `tooling/sandbox` + `tooling/scripts` (generalized to `harness cycle`) |
+| Docker sandbox + launchd cron | `tooling/sandbox` + `tooling/scripts` (generalized to `norma cycle`) |
 
 ## Determinism
 

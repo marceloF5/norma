@@ -7,7 +7,7 @@ set -euo pipefail
 /usr/local/bin/init-firewall.sh
 
 : "${CLAUDE_CODE_OAUTH_TOKEN:?missing — run 'claude setup-token' on the host and inject it}"
-: "${HARNESS_PROJECT:?missing — the tracker project/epic id to advance}"
+: "${NORMA_PROJECT:?missing — the tracker project/epic id to advance}"
 
 git config --global --add safe.directory /workspace
 git config --global --add safe.directory '/workspace/*'
@@ -20,9 +20,9 @@ pnpm install --frozen-lockfile
 pnpm --filter @norma/cli build
 
 CONFIG_ARG=()
-[[ -n "${HARNESS_CONFIG:-}" ]] && CONFIG_ARG=(--config "${HARNESS_CONFIG}")
+[[ -n "${NORMA_CONFIG:-}" ]] && CONFIG_ARG=(--config "${NORMA_CONFIG}")
 
-echo "[entrypoint] running: harness cycle ${HARNESS_PROJECT}"
-exec node apps/cli/dist/index.js "${CONFIG_ARG[@]}" cycle "${HARNESS_PROJECT}" \
-  ${HARNESS_SLUG:+--slug "${HARNESS_SLUG}"} \
-  ${HARNESS_WORKTREE:+--worktree "${HARNESS_WORKTREE}"}
+echo "[entrypoint] running: harness cycle ${NORMA_PROJECT}"
+exec node apps/cli/dist/index.js "${CONFIG_ARG[@]}" cycle "${NORMA_PROJECT}" \
+  ${NORMA_SLUG:+--slug "${NORMA_SLUG}"} \
+  ${NORMA_WORKTREE:+--worktree "${NORMA_WORKTREE}"}

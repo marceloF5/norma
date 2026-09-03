@@ -15,7 +15,7 @@ interface MemoryProject {
 
 /**
  * A fully in-memory tracker — the reference adapter. No network, deterministic,
- * ideal for orchestrator tests and `harness plan` demos. It stores raw issues
+ * ideal for orchestrator tests and `norma plan` demos. It stores raw issues
  * (state names + labels) exactly like a real tracker and mutates them on
  * `transition`, so the same normalizer + engine path is exercised end-to-end.
  */

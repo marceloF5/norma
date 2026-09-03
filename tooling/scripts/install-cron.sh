@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # Install / remove a daily launchd job that runs one harness cycle (macOS only).
 #
-#   HARNESS_PROJECT=<id> ./tooling/scripts/install-cron.sh install
+#   NORMA_PROJECT=<id> ./tooling/scripts/install-cron.sh install
 #   ./tooling/scripts/install-cron.sh uninstall
 #   ./tooling/scripts/install-cron.sh status
 #
-# Override the time with HARNESS_HOUR / HARNESS_MINUTE (default 18:00).
+# Override the time with NORMA_HOUR / NORMA_MINUTE (default 18:00).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-LABEL="co.harness.cycle"
+LABEL="co.norma.cycle"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
-RUNNER="$SCRIPT_DIR/harness-cycle.sh"
-HOUR="${HARNESS_HOUR:-18}"; MINUTE="${HARNESS_MINUTE:-0}"
+RUNNER="$SCRIPT_DIR/norma-cycle.sh"
+HOUR="${NORMA_HOUR:-18}"; MINUTE="${NORMA_MINUTE:-0}"
 DOMAIN="gui/$(id -u)"
 cmd="${1:-status}"
 
@@ -28,13 +28,13 @@ write_plist() {
   <key>ProgramArguments</key>
   <array><string>/bin/bash</string><string>$RUNNER</string></array>
   <key>EnvironmentVariables</key>
-  <dict><key>HARNESS_PROJECT</key><string>${HARNESS_PROJECT:-}</string></dict>
+  <dict><key>NORMA_PROJECT</key><string>${NORMA_PROJECT:-}</string></dict>
   <key>StartCalendarInterval</key>
   <dict><key>Hour</key><integer>$HOUR</integer><key>Minute</key><integer>$MINUTE</integer></dict>
   <key>RunAtLoad</key><false/>
   <key>WorkingDirectory</key><string>$ROOT</string>
-  <key>StandardOutPath</key><string>$ROOT/.harness/logs/launchd.out.log</string>
-  <key>StandardErrorPath</key><string>$ROOT/.harness/logs/launchd.err.log</string>
+  <key>StandardOutPath</key><string>$ROOT/.norma/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key><string>$ROOT/.norma/logs/launchd.err.log</string>
   <key>ProcessType</key><string>Background</string>
 </dict>
 </plist>
@@ -44,8 +44,8 @@ PLIST
 
 case "$cmd" in
   install)
-    : "${HARNESS_PROJECT:?set HARNESS_PROJECT before installing}"
-    chmod +x "$RUNNER"; mkdir -p "$ROOT/.harness/logs"; write_plist
+    : "${NORMA_PROJECT:?set NORMA_PROJECT before installing}"
+    chmod +x "$RUNNER"; mkdir -p "$ROOT/.norma/logs"; write_plist
     launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
     launchctl bootstrap "$DOMAIN" "$PLIST"
     launchctl enable "$DOMAIN/$LABEL"

@@ -2,7 +2,7 @@
 # Default-deny egress firewall for the harness sandbox. Run as root at container boot.
 # Allows ONLY the domains a cycle needs; everything else outbound is dropped, so a
 # confused/compromised agent cannot exfiltrate. Extend ALLOW_DOMAINS via
-# HARNESS_ALLOW_DOMAINS (space-separated) for your tracker (e.g. your-site.atlassian.net).
+# NORMA_ALLOW_DOMAINS (space-separated) for your tracker (e.g. your-site.atlassian.net).
 set -euo pipefail
 
 ALLOW_DOMAINS=(
@@ -11,8 +11,8 @@ ALLOW_DOMAINS=(
   registry.npmjs.org         # pnpm installs
 )
 # Append tracker-specific hosts (e.g. Jira Cloud site) without editing this file.
-if [[ -n "${HARNESS_ALLOW_DOMAINS:-}" ]]; then
-  read -r -a EXTRA <<< "${HARNESS_ALLOW_DOMAINS}"
+if [[ -n "${NORMA_ALLOW_DOMAINS:-}" ]]; then
+  read -r -a EXTRA <<< "${NORMA_ALLOW_DOMAINS}"
   ALLOW_DOMAINS+=("${EXTRA[@]}")
 fi
 

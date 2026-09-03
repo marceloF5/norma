@@ -1,5 +1,5 @@
 export {
-  HarnessConfigSchema,
+  NormaConfigSchema,
   PhaseMappingSchema,
   PolicySchema,
   RoleMapSchema,
@@ -11,7 +11,7 @@ export {
   toPlanContext,
 } from "./schema.js";
 export type {
-  HarnessConfig,
+  NormaConfig,
   PhaseMapping,
   ClassifyRule,
   ApplyRule,

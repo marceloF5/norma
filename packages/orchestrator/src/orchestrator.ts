@@ -1,5 +1,5 @@
 import type { AgentRunner } from "@norma/agent-runtime";
-import { type HarnessConfig, toPlanContext } from "@norma/config";
+import { type NormaConfig, toPlanContext } from "@norma/config";
 import { type ContextStore, composeHandoff } from "@norma/context";
 import {
   type CompleteIntent,
@@ -17,7 +17,7 @@ import {
 import { type RawIssue, type TrackerAdapter, applyFor, normalize } from "@norma/tracker";
 
 export interface OrchestratorDeps {
-  config: HarnessConfig;
+  config: NormaConfig;
   tracker: TrackerAdapter;
   runner: AgentRunner;
   context?: ContextStore;

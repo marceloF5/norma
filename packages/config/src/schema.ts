@@ -83,7 +83,7 @@ export const RuntimeSchema = z
   })
   .strict();
 
-export const HarnessConfigSchema = z
+export const NormaConfigSchema = z
   .object({
     name: z.string(),
     description: z.string().optional(),
@@ -95,20 +95,20 @@ export const HarnessConfigSchema = z
   })
   .strict();
 
-export type HarnessConfig = z.infer<typeof HarnessConfigSchema>;
+export type NormaConfig = z.infer<typeof NormaConfigSchema>;
 export type PhaseMapping = z.infer<typeof PhaseMappingSchema>;
 export type ClassifyRule = z.infer<typeof ClassifyRuleSchema>;
 export type ApplyRule = z.infer<typeof ApplyRuleSchema>;
 export type TrackerConfig = z.infer<typeof TrackerSchema>;
 export type RuntimeConfig = z.infer<typeof RuntimeSchema>;
 
-/** Parse + validate an unknown value into a HarnessConfig (throws on invalid). */
-export function parseConfig(input: unknown): HarnessConfig {
-  return HarnessConfigSchema.parse(input);
+/** Parse + validate an unknown value into a NormaConfig (throws on invalid). */
+export function parseConfig(input: unknown): NormaConfig {
+  return NormaConfigSchema.parse(input);
 }
 
 /** Build the core PlanContext from a validated config. */
-export function toPlanContext(config: HarnessConfig): {
+export function toPlanContext(config: NormaConfig): {
   policy: import("@norma/core").PlanPolicy;
   roles: import("@norma/core").RoleMap;
 } {

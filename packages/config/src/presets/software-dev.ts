@@ -1,4 +1,4 @@
-import type { HarnessConfig } from "../schema.js";
+import type { NormaConfig } from "../schema.js";
 
 /**
  * The "software-dev" pipeline — a faithful, provider-agnostic port of the
@@ -7,7 +7,7 @@ import type { HarnessConfig } from "../schema.js";
  * Nothing here is hardcoded in the engine: swap the states/labels for another
  * tracker's vocabulary, or the roles for another team, without touching core.
  */
-export const softwareDevConfig: HarnessConfig = {
+export const softwareDevConfig: NormaConfig = {
   name: "software-dev",
   description:
     "Epic → tasks (DAG + qa-batches) → dev → code-review → QA → released, one-in-flight per engineer.",

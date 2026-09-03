@@ -3,19 +3,19 @@ import { resolve } from "node:path";
 import { JiraAdapter } from "@norma/adapter-jira";
 import { LinearAdapter } from "@norma/adapter-linear";
 import { type AgentRunner, ClaudeCodeRunner, EchoRunner } from "@norma/agent-runtime";
-import { type HarnessConfig, parseConfig, softwareDevConfig } from "@norma/config";
+import { type NormaConfig, parseConfig, softwareDevConfig } from "@norma/config";
 import { FsContextStore } from "@norma/context";
 import { MemoryTracker, type TrackerAdapter } from "@norma/tracker";
 
 /** Load a config from a JSON file, or fall back to the software-dev preset. */
-export async function loadConfig(path?: string): Promise<HarnessConfig> {
+export async function loadConfig(path?: string): Promise<NormaConfig> {
   if (!path) return parseConfig(softwareDevConfig);
   const raw = await readFile(resolve(path), "utf8");
   return parseConfig(JSON.parse(raw));
 }
 
 /** Build a tracker adapter from config + environment. */
-export function makeTracker(config: HarnessConfig): TrackerAdapter {
+export function makeTracker(config: NormaConfig): TrackerAdapter {
   const bounceMarker = config.phaseMapping.bounceMarker;
   const o = config.tracker.options as Record<string, unknown>;
   switch (config.tracker.kind) {
@@ -35,7 +35,7 @@ export function makeTracker(config: HarnessConfig): TrackerAdapter {
 }
 
 /** Build an agent runner from config. */
-export function makeRunner(config: HarnessConfig): AgentRunner {
+export function makeRunner(config: NormaConfig): AgentRunner {
   const o = config.runtime.options as Record<string, unknown>;
   switch (config.runtime.kind) {
     case "claude-code":
@@ -48,6 +48,6 @@ export function makeRunner(config: HarnessConfig): AgentRunner {
 }
 
 /** Build the filesystem context store (durable brief/PLAN/report). */
-export function makeContext(root = ".harness"): FsContextStore {
+export function makeContext(root = ".norma"): FsContextStore {
   return new FsContextStore(resolve(root));
 }

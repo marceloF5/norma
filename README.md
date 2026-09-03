@@ -1,4 +1,4 @@
-# Harness CORE
+# Norma
 
 A **provider-agnostic orchestration engine for AI agent pipelines**. It turns a
 described unit of work into reviewed, verified, done work — with agents playing fixed
@@ -13,7 +13,7 @@ everything specific is now **config + adapters**.
 ```
  intake ──► planner agent ──► tracker (project + tasks: DAG + qa-batches)
                                     │
-        ┌───────────  harness cycle (cron or on-demand)  ───────────┐
+        ┌───────────  norma cycle (cron or on-demand)  ───────────┐
         │                                                            │
    worker agents  ──►  reviewer  ──►  QA (per batch)                 │
         ▲          (rework loop on bounce; escalate at N)     │      │
@@ -80,16 +80,16 @@ Against a real tracker:
 
 ```bash
 export LINEAR_API_KEY=lin_api_xxx           # or JIRA_BASE_URL / JIRA_EMAIL / JIRA_API_TOKEN
-harness whoami                              # verify credentials
-harness plan <projectId>                    # print the deterministic plan (no writes)
-harness cycle <projectId> --slug my-epic    # advance the epic one cycle
-harness complete <projectId>                # flip released tasks → done
+norma whoami                              # verify credentials
+norma plan <projectId>                    # print the deterministic plan (no writes)
+norma cycle <projectId> --slug my-epic    # advance the epic one cycle
+norma complete <projectId>                # flip released tasks → done
 ```
 
 Use a different pipeline/tracker with `--config`:
 
 ```bash
-harness --config examples/jira.config.json plan <epicKey>
+norma --config examples/jira.config.json plan <epicKey>
 ```
 
 ## Autonomous runs (optional)

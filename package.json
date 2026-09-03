@@ -2,7 +2,7 @@
   "name": "@norma/monorepo",
   "version": "0.0.0",
   "private": true,
-  "description": "Harness CORE — provider-agnostic orchestration engine for AI agent pipelines (DAG + loop + context handoff).",
+  "description": "Norma — provider-agnostic orchestration engine for AI agent pipelines (DAG + loop + context handoff).",
   "type": "module",
   "packageManager": "pnpm@9.15.9",
   "engines": {
@@ -15,7 +15,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
-    "harness": "pnpm --filter @norma/cli exec harness",
+    "norma": "pnpm --filter @norma/cli exec norma",
     "format": "biome format --write ."
   },
   "devDependencies": {

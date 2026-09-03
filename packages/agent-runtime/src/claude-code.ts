@@ -14,8 +14,8 @@ export interface ClaudeCodeRunnerOptions {
   timeoutMs?: number;
 }
 
-const VERDICT_RE = /HARNESS_VERDICT:\s*(ok|pass|fail|approve|bounce|error)/i;
-const BOUNCE_RE = /HARNESS_BOUNCE:\s*([A-Z][A-Z0-9]*-\d+)\s*:\s*(.+)/gi;
+const VERDICT_RE = /NORMA_VERDICT:\s*(ok|pass|fail|approve|bounce|error)/i;
+const BOUNCE_RE = /NORMA_BOUNCE:\s*([A-Z][A-Z0-9]*-\d+)\s*:\s*(.+)/gi;
 
 /**
  * Drives a role by shelling out to the Claude Code CLI headlessly (`claude -p`).
@@ -30,16 +30,16 @@ export class ClaudeCodeRunner implements AgentRunner {
   private buildPrompt(req: AgentRequest): string {
     const verdictContract = [
       "",
-      "── HARNESS PROTOCOL ─────────────────────────────────────────────",
+      "── NORMA PROTOCOL ──────────────────────────────────────────────",
       "When done, output EXACTLY one line:",
-      "  HARNESS_VERDICT: <ok|pass|fail|approve|bounce|error>",
+      "  NORMA_VERDICT: <ok|pass|fail|approve|bounce|error>",
       "Semantics by stage:",
       "  dispatch/rework → ok (green: lint+build+tests pass) or error",
       "  review          → pass or fail",
       "  qa              → approve or bounce",
       "  escalate        → ok (re-scoped) or error",
       "For a QA bounce, also emit one line per failing task:",
-      "  HARNESS_BOUNCE: <TASK-REF>: <one-line defect>",
+      "  NORMA_BOUNCE: <TASK-REF>: <one-line defect>",
       "─────────────────────────────────────────────────────────────────",
     ].join("\n");
     return `You are the "${req.role}" agent. Stage: ${req.kind}.\n\n${req.context}\n${verdictContract}`;

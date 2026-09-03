@@ -10,8 +10,8 @@ coverage/
 !.env.example
 
 # harness runtime artifacts
-.harness/logs/
-.harness/state/
+.norma/logs/
+.norma/state/
 
 # OS
 .DS_Store

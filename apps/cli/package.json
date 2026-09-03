@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "harness": "./dist/index.js"
+    "norma": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup",
