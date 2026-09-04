@@ -58,9 +58,10 @@ engine change.
 | **`@norma/adapter-linear`** | `TrackerAdapter` over the Linear GraphQL API. |
 | **`@norma/adapter-jira`** | `TrackerAdapter` over the Jira Cloud REST API. |
 | **`@norma/agent-runtime`** | The `AgentRunner` port + a Claude Code runner (`claude -p`) and an offline echo runner. |
+| **`@norma/agents`** | Runtime-neutral `AgentSpec`, the pre-established agent catalog, and Markdown (de)serialization. |
 | **`@norma/context`** | The `ContextStore` (durable brief / PLAN / report) + the handoff prompt composer. |
 | **`@norma/orchestrator`** | The operator loop: plan → execute → write-back → re-plan, to a fixed point. |
-| **`@norma/cli`** (`harness`) | `whoami · plan · cycle · complete · demo`, wiring config → adapter → runner. |
+| **`@norma/cli`** (`norma`) | `init · doctor · agents · whoami · plan · cycle · complete · demo`, wiring everything together. |
 
 Ports & adapters throughout: swap the tracker, the agent runtime, or the pipeline
 definition independently — the engine and orchestrator never change.
@@ -70,31 +71,77 @@ definition independently — the engine and orchestrator never change.
 ```bash
 pnpm install
 pnpm build
-pnpm test          # 29 tests across the engine, normalizer, and full loop
+pnpm test          # engine, normalizer, mapping, agents & the full loop
 
 # Run the whole loop offline — no credentials, memory tracker + echo agents:
 pnpm --filter @norma/cli exec tsx src/index.ts demo
 ```
 
-Against a real tracker:
+## Onboarding — `norma init`
+
+Install Norma into an existing project with one interactive command. It connects to
+your tracker, reads your **real board columns**, and walks you through mapping them onto
+Norma's canonical phases, choosing your worker lanes and agents, and picking the
+execution runtime. It then writes everything out.
 
 ```bash
-export LINEAR_API_KEY=lin_api_xxx           # or JIRA_BASE_URL / JIRA_EMAIL / JIRA_API_TOKEN
+export LINEAR_API_KEY=lin_api_xxx      # so init can read your Linear board
+cd your-project
+norma init                             # interactive wizard
+```
+
+It produces, in your project:
+
+```
+norma.config.json          # tracker + runtime + policy + roles + phaseMapping (Zod-validated)
+.norma/agents/*.md         # the chosen agents (editable Markdown + frontmatter)
+```
+
+and, if your board is missing any states/labels the pipeline needs, offers to **create
+them** for you.
+
+Non-interactive (CI / scripted):
+
+```bash
+norma init --yes --tracker linear --team Acme --workers api,web --runtime claude-code
+```
+
+Supporting commands:
+
+```bash
+norma doctor            # validate config + tracker auth + board mapping + agent files
+norma agents list       # catalog: which agents are installed vs available
+norma agents add <role> # install another catalog agent into .norma/agents
+```
+
+## Everyday use
+
+Once initialized (config is auto-discovered upward from the cwd):
+
+```bash
 norma whoami                              # verify credentials
 norma plan <projectId>                    # print the deterministic plan (no writes)
 norma cycle <projectId> --slug my-epic    # advance the epic one cycle
 norma complete <projectId>                # flip released tasks → done
 ```
 
-Use a different pipeline/tracker with `--config`:
+Point at a different config explicitly with `--config`:
 
 ```bash
 norma --config examples/jira.config.json plan <epicKey>
 ```
 
+### Execution-model agnostic
+
+The agent *definition* (`AgentSpec`: role, instructions, model, tools) is separate from
+the *execution runtime* (`AgentRunner`). The same `.norma/agents/*.md` run on any
+runtime — `norma init` writes `runtime: { kind }` (today `claude-code` or `echo`);
+adding another (Agent SDK, OpenAI, a human queue) is a new `AgentRunner`, with zero
+changes to the engine, the orchestrator, or your agents.
+
 ## Autonomous runs (optional)
 
-`tooling/scripts/harness-cycle.sh` runs one cycle headlessly with a lock + log;
+`tooling/scripts/norma-cycle.sh` runs one cycle headlessly with a lock + log;
 `install-cron.sh` schedules it daily (macOS launchd). For unattended runs, the
 `tooling/sandbox/` container is the jail: only the repo is mounted, egress is
 allowlisted, auth is injected as env, and the agent runs `--permission-mode
@@ -103,8 +150,8 @@ bypassPermissions` safely inside it.
 ## Extending
 
 - **New tracker** → implement `TrackerAdapter` (5 read/write methods) + a `phaseMapping`.
-- **New pipeline** → write a `HarnessConfig` (workers, roles, gates, mapping). The
-  `software-dev` preset is the reference.
+- **New pipeline** → run `norma init`, or write a `NormaConfig` (workers, roles, gates,
+  mapping). The `software-dev` preset is the reference.
 - **New agent runtime** → implement `AgentRunner` (`run(request) → outcome`).
 
 See `docs/ARCHITECTURE.md` for the full design and the mapping from the original harness.

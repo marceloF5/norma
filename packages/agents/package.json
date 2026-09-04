@@ -1,5 +1,5 @@
 {
-  "name": "@norma/agent-runtime",
+  "name": "@norma/agents",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,10 +15,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check src",
     "clean": "rm -rf dist .turbo"
-  },
-  "dependencies": {
-    "@norma/agents": "workspace:*",
-    "@norma/core": "workspace:*"
   },
   "devDependencies": {
     "@norma/tsconfig": "workspace:*",

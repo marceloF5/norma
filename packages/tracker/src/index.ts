@@ -15,3 +15,9 @@ export {
   applyFor,
 } from "./normalize.js";
 export { MemoryTracker } from "./memory.js";
+export type {
+  TrackerIntrospection,
+  TrackerState,
+  TrackerLabel,
+} from "./introspection.js";
+export { supportsIntrospection, canProvisionBoard } from "./introspection.js";

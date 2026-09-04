@@ -1,10 +1,11 @@
 import { spawn } from "node:child_process";
+import { type AgentSpec, readAgent } from "@norma/agents";
 import type { AgentOutcome, AgentRequest, AgentRunner, Verdict } from "./port.js";
 
 export interface ClaudeCodeRunnerOptions {
   /** Path to the claude CLI (default "claude"). */
   bin?: string;
-  /** Model to pin (e.g. "claude-opus-4-8"). */
+  /** Model to pin (e.g. "claude-opus-4-8"). Overrides an agent's suggested model. */
   model?: string;
   /** Permission mode (default "bypassPermissions" — intended for the sandbox). */
   permissionMode?: string;
@@ -12,6 +13,11 @@ export interface ClaudeCodeRunnerOptions {
   extraArgs?: string[];
   /** Per-invocation timeout in ms (default 30 min). */
   timeoutMs?: number;
+  /**
+   * Directory of `.md` agent definitions (`.norma/agents`). When set, the role's
+   * file becomes the agent's system prompt and its `model` is used unless overridden.
+   */
+  agentsDir?: string;
 }
 
 const VERDICT_RE = /NORMA_VERDICT:\s*(ok|pass|fail|approve|bounce|error)/i;
@@ -27,7 +33,13 @@ export class ClaudeCodeRunner implements AgentRunner {
   readonly kind = "claude-code";
   constructor(private readonly opts: ClaudeCodeRunnerOptions = {}) {}
 
-  private buildPrompt(req: AgentRequest): string {
+  private async loadSpec(role: string): Promise<AgentSpec | null> {
+    if (!this.opts.agentsDir) return null;
+    return readAgent(this.opts.agentsDir, role);
+  }
+
+  private buildPrompt(req: AgentRequest, spec: AgentSpec | null): string {
+    const persona = spec?.instructions ? spec.instructions : `You are the "${req.role}" agent.`;
     const verdictContract = [
       "",
       "── NORMA PROTOCOL ──────────────────────────────────────────────",
@@ -42,7 +54,7 @@ export class ClaudeCodeRunner implements AgentRunner {
       "  NORMA_BOUNCE: <TASK-REF>: <one-line defect>",
       "─────────────────────────────────────────────────────────────────",
     ].join("\n");
-    return `You are the "${req.role}" agent. Stage: ${req.kind}.\n\n${req.context}\n${verdictContract}`;
+    return `${persona}\n\nStage: ${req.kind}.\n\n${req.context}\n${verdictContract}`;
   }
 
   private parse(stdout: string): AgentOutcome {
@@ -60,10 +72,12 @@ export class ClaudeCodeRunner implements AgentRunner {
     };
   }
 
-  run(req: AgentRequest): Promise<AgentOutcome> {
+  async run(req: AgentRequest): Promise<AgentOutcome> {
+    const spec = await this.loadSpec(req.role);
     const bin = this.opts.bin ?? "claude";
-    const args = ["-p", this.buildPrompt(req)];
-    if (this.opts.model) args.push("--model", this.opts.model);
+    const args = ["-p", this.buildPrompt(req, spec)];
+    const model = this.opts.model ?? spec?.suggestedModel;
+    if (model) args.push("--model", model);
     args.push("--permission-mode", this.opts.permissionMode ?? "bypassPermissions");
     if (this.opts.extraArgs) args.push(...this.opts.extraArgs);
 

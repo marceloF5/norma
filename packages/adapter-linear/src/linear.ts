@@ -5,6 +5,9 @@ import type {
   RawIssue,
   TrackerAdapter,
   TrackerIdentity,
+  TrackerIntrospection,
+  TrackerLabel,
+  TrackerState,
 } from "@norma/tracker";
 import { LinearGql } from "./gql.js";
 
@@ -49,7 +52,7 @@ interface RawNode {
 }
 
 /** Linear implementation of the tracker port (GraphQL, headless-safe). */
-export class LinearAdapter implements TrackerAdapter {
+export class LinearAdapter implements TrackerAdapter, TrackerIntrospection {
   readonly kind = "linear";
   private gql: LinearGql;
   private teamName: string;
@@ -247,5 +250,52 @@ export class LinearAdapter implements TrackerAdapter {
       `mutation($input:IssueRelationCreateInput!){ issueRelationCreate(input:$input){ success } }`,
       { input: { issueId: input.blockedById, relatedIssueId: input.issueId, type: "blocks" } },
     );
+  }
+
+  // --- introspection (board setup for `norma init`) -------------------------
+
+  async listStates(): Promise<TrackerState[]> {
+    const t = await this.team();
+    return t.states.nodes
+      .slice()
+      .sort((a, b) => a.position - b.position)
+      .map((s) => ({ id: s.id, name: s.name, type: s.type }));
+  }
+
+  async listLabels(): Promise<TrackerLabel[]> {
+    const t = await this.team();
+    return t.labels.nodes.map((l) => ({ id: l.id, name: l.name }));
+  }
+
+  async createState(input: { name: string; type?: string; color?: string }): Promise<TrackerState> {
+    const t = await this.team();
+    const d = await this.gql.query<{
+      workflowStateCreate: { workflowState: { id: string; name: string; type: string } };
+    }>(
+      `mutation($input:WorkflowStateCreateInput!){ workflowStateCreate(input:$input){ success workflowState{ id name type position } } }`,
+      {
+        input: {
+          teamId: t.id,
+          name: input.name,
+          type: input.type ?? "started",
+          color: input.color ?? "#00B8A9",
+        },
+      },
+    );
+    this._team = undefined; // cache is now stale
+    const s = d.workflowStateCreate.workflowState;
+    return { id: s.id, name: s.name, type: s.type };
+  }
+
+  async createLabel(input: { name: string; color?: string }): Promise<TrackerLabel> {
+    const t = await this.team();
+    const d = await this.gql.query<{
+      issueLabelCreate: { issueLabel: { id: string; name: string } };
+    }>(
+      `mutation($input:IssueLabelCreateInput!){ issueLabelCreate(input:$input){ success issueLabel{ id name } } }`,
+      { input: { teamId: t.id, name: input.name, color: input.color ?? "#9B51E0" } },
+    );
+    this._team = undefined;
+    return d.issueLabelCreate.issueLabel;
   }
 }

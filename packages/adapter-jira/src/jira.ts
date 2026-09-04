@@ -5,6 +5,9 @@ import type {
   RawIssue,
   TrackerAdapter,
   TrackerIdentity,
+  TrackerIntrospection,
+  TrackerLabel,
+  TrackerState,
 } from "@norma/tracker";
 import { JiraRest, adf } from "./rest.js";
 
@@ -47,7 +50,7 @@ const FIELDS = ["summary", "labels", "status", "issuelinks", "comment"];
 const isIssueKey = (s: string) => /^[A-Z][A-Z0-9]+-\d+$/.test(s);
 
 /** Jira Cloud implementation of the tracker port. */
-export class JiraAdapter implements TrackerAdapter {
+export class JiraAdapter implements TrackerAdapter, TrackerIntrospection {
   readonly kind = "jira";
   private rest: JiraRest;
   private projectKey?: string;
@@ -206,5 +209,37 @@ export class JiraAdapter implements TrackerAdapter {
       inwardIssue: { id: input.issueId }, // "is blocked by"
       outwardIssue: { id: input.blockedById }, // "blocks"
     });
+  }
+
+  // --- introspection (read-only; Jira status/label creation is admin-managed) ---
+
+  async listStates(): Promise<TrackerState[]> {
+    if (!this.projectKey) throw new Error("JiraAdapter.listStates: projectKey is required");
+    // Statuses are grouped per issue type; flatten to a unique set.
+    const groups = await this.rest.get<
+      { statuses: { id: string; name: string; statusCategory?: { key: string } }[] }[]
+    >(`/rest/api/3/project/${this.projectKey}/statuses`);
+    const seen = new Map<string, TrackerState>();
+    for (const g of groups) {
+      for (const s of g.statuses ?? []) {
+        if (!seen.has(s.name))
+          seen.set(s.name, { id: s.id, name: s.name, type: s.statusCategory?.key });
+      }
+    }
+    return [...seen.values()];
+  }
+
+  async listLabels(): Promise<TrackerLabel[]> {
+    const out: TrackerLabel[] = [];
+    let startAt = 0;
+    for (;;) {
+      const page = await this.rest.get<{ values: string[]; isLast: boolean; total: number }>(
+        `/rest/api/3/label?startAt=${startAt}&maxResults=1000`,
+      );
+      for (const name of page.values ?? []) out.push({ id: name, name });
+      if (page.isLast || !page.values?.length) break;
+      startAt += page.values.length;
+    }
+    return out;
   }
 }

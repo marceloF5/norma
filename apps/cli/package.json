@@ -15,9 +15,11 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@clack/prompts": "0.9.1",
     "@norma/adapter-jira": "workspace:*",
     "@norma/adapter-linear": "workspace:*",
     "@norma/agent-runtime": "workspace:*",
+    "@norma/agents": "workspace:*",
     "@norma/config": "workspace:*",
     "@norma/context": "workspace:*",
     "@norma/core": "workspace:*",

@@ -4,11 +4,19 @@ import { Phase, computePlan } from "@norma/core";
 import { Orchestrator } from "@norma/orchestrator";
 import { MemoryTracker, type RawIssue, applyFor, normalize } from "@norma/tracker";
 import { Command } from "commander";
-import { loadConfig, makeContext, makeRunner, makeTracker } from "./factory.js";
+import { registerAgents } from "./commands/agents.js";
+import { registerDoctor } from "./commands/doctor.js";
+import { registerInit } from "./commands/init.js";
+import {
+  type ResolvedConfig,
+  makeContext,
+  makeRunner,
+  makeTracker,
+  resolveConfig,
+} from "./factory.js";
 
 interface GlobalOpts {
   config?: string;
-  contextRoot: string;
   tracker?: string;
   runtime?: string;
 }
@@ -20,27 +28,27 @@ program
   .version("0.0.0")
   .option(
     "-c, --config <path>",
-    "path to a norma config JSON (defaults to the software-dev preset)",
+    "path to a norma config JSON (default: discover norma.config.json)",
   )
-  .option("--context-root <dir>", "root dir for durable brief/PLAN/report", ".norma")
   .option("--tracker <kind>", "override tracker kind (linear|jira|memory)")
   .option("--runtime <kind>", "override agent runtime (claude-code|echo)");
 
-async function resolveConfig(): Promise<NormaConfig> {
+/** Resolve config (discovery + overrides) shared by every command. */
+export async function resolved(): Promise<ResolvedConfig> {
   const g = program.opts<GlobalOpts>();
-  const config = await loadConfig(g.config);
+  const r = await resolveConfig(g.config);
   if (g.tracker)
-    config.tracker = { ...config.tracker, kind: g.tracker as NormaConfig["tracker"]["kind"] };
+    r.config.tracker = { ...r.config.tracker, kind: g.tracker as NormaConfig["tracker"]["kind"] };
   if (g.runtime)
-    config.runtime = { ...config.runtime, kind: g.runtime as NormaConfig["runtime"]["kind"] };
-  return config;
+    r.config.runtime = { ...r.config.runtime, kind: g.runtime as NormaConfig["runtime"]["kind"] };
+  return r;
 }
 
 program
   .command("whoami")
   .description("verify tracker credentials and print the acting identity")
   .action(async () => {
-    const config = await resolveConfig();
+    const { config } = await resolved();
     const tracker = makeTracker(config);
     const me = await tracker.whoami();
     console.log(JSON.stringify({ tracker: tracker.kind, ...me }, null, 2));
@@ -51,7 +59,7 @@ program
   .argument("<projectId>", "tracker project/epic id")
   .description("print the deterministic engine plan (no writes)")
   .action(async (projectId: string) => {
-    const config = await resolveConfig();
+    const { config } = await resolved();
     const tracker = makeTracker(config);
     const raw = await tracker.listIssues({ projectId });
     const tasks = normalize(raw, config.phaseMapping);
@@ -72,13 +80,12 @@ program
       projectId: string,
       opts: { slug?: string; worktree?: string; maxSteps: string; dryRun: boolean },
     ) => {
-      const g = program.opts<GlobalOpts>();
-      const config = await resolveConfig();
+      const r = await resolved();
       const orch = new Orchestrator({
-        config,
-        tracker: makeTracker(config),
-        runner: makeRunner(config),
-        context: makeContext(g.contextRoot),
+        config: r.config,
+        tracker: makeTracker(r.config),
+        runner: makeRunner(r.config, r.agentsDir),
+        context: makeContext(r.contextRoot),
         logger: (m) => console.error(m),
       });
       const result = await orch.runCycle({
@@ -110,7 +117,7 @@ program
   .argument("<projectId>", "tracker project/epic id")
   .description("flip every released task to done (the /staging step)")
   .action(async (projectId: string) => {
-    const config = await resolveConfig();
+    const { config } = await resolved();
     const tracker = makeTracker(config);
     const raw = await tracker.listIssues({ projectId });
     const tasks = normalize(raw, config.phaseMapping);
@@ -125,7 +132,7 @@ program
   .command("demo")
   .description("run a full cycle offline (memory tracker + echo runner) — no credentials needed")
   .action(async () => {
-    const config = await resolveConfig();
+    const { config } = await resolved();
     const seed: RawIssue[] = [
       {
         id: "iss-1",
@@ -170,6 +177,11 @@ program
       ),
     );
   });
+
+// Onboarding & maintenance commands (each registers itself on the program).
+registerInit(program, resolved);
+registerDoctor(program, resolved);
+registerAgents(program, resolved);
 
 program.parseAsync().catch((err) => {
   console.error("FATAL:", err instanceof Error ? err.message : err);

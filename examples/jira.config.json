@@ -34,10 +34,26 @@
     "apply": {
       "ready": { "state": "To Do", "addLabels": ["ready-for-dev"], "removeLabels": [] },
       "in_progress": { "state": "In Progress", "addLabels": [], "removeLabels": ["ready-for-dev"] },
-      "needs_review": { "state": "In Review", "addLabels": ["needs-review"], "removeLabels": ["changes-requested", "needs-qa"] },
-      "needs_qa": { "state": "In Review", "addLabels": ["needs-qa"], "removeLabels": ["needs-review"] },
-      "needs_rework": { "state": "In Progress", "addLabels": ["changes-requested"], "removeLabels": ["needs-review", "needs-qa"] },
-      "released": { "state": "Ready for PR", "addLabels": ["qa-approved"], "removeLabels": ["needs-qa"] },
+      "needs_review": {
+        "state": "In Review",
+        "addLabels": ["needs-review"],
+        "removeLabels": ["changes-requested", "needs-qa"]
+      },
+      "needs_qa": {
+        "state": "In Review",
+        "addLabels": ["needs-qa"],
+        "removeLabels": ["needs-review"]
+      },
+      "needs_rework": {
+        "state": "In Progress",
+        "addLabels": ["changes-requested"],
+        "removeLabels": ["needs-review", "needs-qa"]
+      },
+      "released": {
+        "state": "Ready for PR",
+        "addLabels": ["qa-approved"],
+        "removeLabels": ["needs-qa"]
+      },
       "done": { "state": "Done", "addLabels": [], "removeLabels": [] }
     },
     "owner": { "fromLabelPrefix": "agent:" },
