@@ -10,6 +10,10 @@ the proven mechanics (a DAG frontier, a loop with concurrency/batch gates, conte
 handoff) are kept; the coupling to one tracker, one vocabulary, and one team is gone —
 everything specific is now **config + adapters**.
 
+> **What Norma is — and what it deliberately is not.** See
+> [`docs/POSITIONING.md`](docs/POSITIONING.md) for the scope boundaries and how Norma
+> compares to tools it is often confused with (Hermes, LangChain/LangGraph, Orca).
+
 ```
  intake ──► planner agent ──► tracker (project + tasks: DAG + qa-batches)
                                     │
@@ -154,4 +158,6 @@ bypassPermissions` safely inside it.
   mapping). The `software-dev` preset is the reference.
 - **New agent runtime** → implement `AgentRunner` (`run(request) → outcome`).
 
-See `docs/ARCHITECTURE.md` for the full design and the mapping from the original harness.
+See `docs/ARCHITECTURE.md` for the full design and the mapping from the original
+harness, and [`docs/POSITIONING.md`](docs/POSITIONING.md) for scope boundaries and
+comparisons to adjacent tools.
