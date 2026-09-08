@@ -51,65 +51,56 @@ you pay that regardless. What determinism cuts is the **orchestration overhead**
 > one-shot flow the difference is marginal. The win is structural and shows up in long,
 > repetitive, unattended pipelines — exactly where Norma is meant to run.
 
-### A back-of-the-envelope model
+### A parametric model (fill in your own numbers)
 
-> ⚠️ **These numbers are an illustrative model, not a benchmark.** They exist to convey
-> order of magnitude and to give you a formula to plug your own measured values into.
-> Real figures depend on your prompts, models, and how much board context each decision
-> carries. Measure before you quote.
+We deliberately **do not quote fabricated token counts here.** The savings depend on your
+prompts, your models, and your board — numbers we have not measured. Instead, here is the
+model as variables; plug in your own measured values.
 
-**The overhead we're pricing.** In an agent-driven orchestrator, every flow decision is
-one LLM call that must (re)read the board state, reason, and emit the next step. Model a
-single decision as:
+**The variables:**
 
-```
-decision cost ≈ input (board state + rules + task context) + output (the chosen step)
-              ≈ ~3,000 in + ~300 out  ≈ ~3,300 tokens per decision
-```
-
-**Decisions per task.** A software-dev task passes through several decision points:
-`promote → dispatch → evaluate review → (rework?) → evaluate QA → complete`. Call it
-**~5 decisions** on the happy path, **~7** with one rework loop.
-
-```
-Orchestration overhead per task (agent-driven):
-  happy path:   5 × 3,300  ≈ 16,500 tokens
-  with rework:  7 × 3,300  ≈ 23,100 tokens
-
-In Norma: 0 tokens (computePlan is code).
-```
-
-**As a percentage of the total.** The *work* (writing/reviewing/testing the task) costs
-the same either way — say `W` tokens per task. The overhead's share is
-`overhead / (overhead + W)`:
-
-| Task work `W` (tokens) | Overhead share, agent-driven | What Norma saves |
+| Symbol | Meaning | Known or measured? |
 |---|---|---|
-| Light task (~20k) | 16.5k / 36.5k ≈ **~45%** | ~45% of total tokens |
-| Typical task (~50k) | 16.5k / 66.5k ≈ **~25%** | ~25% of total tokens |
-| Heavy task (~100k) | 16.5k / 116.5k ≈ **~14%** | ~14% of total tokens |
+| `D` | Flow **decisions per task** | **Known** — it's the number of decision points in the pipeline |
+| `c` | Token cost of **one** orchestration decision (re-read board + reason + emit step) | **Measure it** — depends on prompt & board size |
+| `W` | Token cost of the **work** in a task (write/review/test) | **Measure it** — same in both models |
+| `N` | Number of tasks in the epic | **Known** — read off the board |
 
-So, as a rule of thumb, a deterministic engine tends to cut **~15–45% of total tokens**,
-landing around **~20–25% on typical coding tasks** — and *more* as flows get longer or
-loop more (rework/QA), because the overhead recurs while the work does not.
+**`D` is the one value we can ground**, because it comes from the pipeline's phase graph,
+not from a guess. A software-dev task passes through:
+`promote → dispatch → evaluate review → (rework?) → evaluate QA → complete`. That is about
+**5 decision points** on the happy path, and **+2 per rework round**. In an agent-driven
+orchestrator each of those is an LLM call; in Norma each is a branch of `computePlan`
+(zero tokens).
 
-**Scaled to an epic.** For a 20-task epic on the happy path:
-
-```
-Agent-driven orchestration overhead:  20 × 16,500  ≈ 330,000 tokens spent only deciding
-Norma orchestration overhead:                        0 tokens
-```
-
-**Plug your own numbers:**
+**The formulas:**
 
 ```
-savings ≈ (decisions_per_task × cost_per_decision) × task_count
-share   ≈ overhead_per_task / (overhead_per_task + work_per_task)
+Orchestration overhead per task (agent-driven):   D × c
+Orchestration overhead per task (Norma):           0        ← computePlan is code
+
+Tokens saved over an epic:                         N × D × c
+
+Overhead as a share of total spend:                (D × c) / (D × c + W)
 ```
 
-The two levers that move it most: how much **board context** each decision drags along
-(bigger boards → pricier decisions) and how many **rework/QA rounds** occur (each round
-adds decisions but not proportional work).
+**How to read it, without inventing numbers:**
+
+- Norma's orchestration overhead is **exactly zero tokens** — that part is not an
+  estimate, it's a property of deciding in code. The whole `N × D × c` term simply
+  disappears.
+- The **share** you save is `(D·c) / (D·c + W)`. It rises when decisions are many or
+  expensive (`D·c` large) and falls when the per-task work dwarfs them (`W` large). So
+  the win is biggest on **long, loop-heavy flows with lighter tasks**, and smallest on
+  **short flows with one very heavy task**.
+- The two levers that move it most: how much **board context** each decision drags along
+  (bigger boards → larger `c`) and how many **rework/QA rounds** occur (each round raises
+  `D` but adds little to `W`).
+
+**To turn this into real numbers:** instrument one real epic — log the tokens spent on
+orchestration decisions vs. on task work — and substitute your measured `c`, `W`, `D`,
+`N`. Until then, treat the only hard figure as the one that needs no measurement: the
+overhead Norma removes is `100%` of `N × D × c`.
 
 ## 2. Predictability — same input, same plan
 
