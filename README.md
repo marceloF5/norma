@@ -12,7 +12,10 @@ everything specific is now **config + adapters**.
 
 > **What Norma is — and what it deliberately is not.** See
 > [`docs/POSITIONING.md`](docs/POSITIONING.md) for the scope boundaries and how Norma
-> compares to tools it is often confused with (Hermes, LangChain/LangGraph, Orca).
+> compares to tools it is often confused with (Hermes, LangChain/LangGraph, Orca), and
+> [`docs/WHY-DETERMINISTIC.md`](docs/WHY-DETERMINISTIC.md) for why a deterministic
+> orchestrator (token economy, predictability, auditability) beats an LLM-driven one on
+> already-determined pipelines.
 
 ```
  intake ──► planner agent ──► tracker (project + tasks: DAG + qa-batches)
