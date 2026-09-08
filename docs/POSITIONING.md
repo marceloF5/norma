@@ -1,143 +1,140 @@
-# Posicionamento do Norma — o que somos e o que não somos
+# Norma positioning — what we are and what we are not
 
-Este documento existe para deixar clara a **fronteira** do Norma: qual problema ele
-resolve, e — principalmente — quais problemas ele **deliberadamente não resolve**. A
-maior parte da confusão sobre o Norma vem de compará-lo com ferramentas que vivem em
-outra camada. Aqui separamos isso de uma vez.
+This document exists to make Norma's **boundary** explicit: which problem it solves and
+— above all — which problems it **deliberately does not**. Most of the confusion about
+Norma comes from comparing it to tools that live in a different layer. This settles it.
 
-## A tese em uma frase
+## The thesis in one sentence
 
-> **Um motor puro e determinístico decide a orquestração; um LLM só faz o trabalho
-> criativo de cada tarefa.**
+> **A pure, deterministic engine decides orchestration; an LLM only does the creative
+> work of each task.**
 
-`computePlan(tasks, ctx)` é uma função pura, testável, que — dado o estado atual das
-tasks — retorna a próxima ação (promote, dispatch, review, rework, escalate, qa,
-complete), respeitando o DAG de dependências, o gate de "uma em andamento por vez" e a
-prontidão dos lotes de QA. O orquestrador é só o operador: lê o tracker, pergunta ao
-motor, roda o agente especialista para cada intent e escreve o resultado de volta. **O
-LLM nunca decide _o que_ acontece a seguir — só _como_ implementar/revisar/testar uma
-task.**
+`computePlan(tasks, ctx)` is a pure, unit-tested function that — given the current state
+of the tasks — returns the next action (promote, dispatch, review, rework, escalate, qa,
+complete), enforcing the dependency DAG, the one-in-flight gate, and QA-batch readiness.
+The orchestrator is just the operator: it reads the tracker, asks the engine, runs the
+specialist agent for each intent, and writes the result back. **The LLM never decides
+_what_ happens next — only _how_ to implement/review/test one task.**
 
-## O que o Norma é
+## What Norma is
 
-- Um **motor de orquestração headless** (CLI + cron) para pipelines de agentes.
-- **Determinístico e auditável**: mesma entrada → mesmo plano, sempre.
-- **Agnóstico ao tracker**: Linear, Jira ou qualquer outro, via porta + adapter + um
-  `phaseMapping` declarativo. O tracker é a **fonte da verdade** do estado.
-- **Agnóstico ao runtime de agente**: Claude Code, echo, e no futuro qualquer outro
-  `AgentRunner`, sem tocar no motor.
-- Focado em **tirar o humano do loop de decisão**: você planeja no começo e revisa o
-  resultado no fim; no meio, a esteira anda sozinha.
+- A **headless orchestration engine** (CLI + cron) for agent pipelines.
+- **Deterministic and auditable**: same input → same plan, every time.
+- **Tracker-agnostic**: Linear, Jira, or any other, via a port + adapter and a
+  declarative `phaseMapping`. The tracker is the **source of truth** for state.
+- **Agent-runtime-agnostic**: Claude Code, echo, and in the future any other
+  `AgentRunner`, without touching the engine.
+- Focused on **taking the human out of the decision loop**: you plan at the start and
+  review the result at the end; in between, the line runs itself.
 
-## O que o Norma **não é** (e não pretende ser)
+## What Norma is **not** (and does not aim to be)
 
-Cada item abaixo é uma **decisão de escopo**, não uma lacuna a ser preenchida.
+Each item below is a **scoping decision**, not a gap waiting to be filled.
 
-### 1. Não é um agente de IA / assistente pessoal
-O Norma não conversa, não tem personalidade, não "cresce com você". Ele não *é* o
-agente — ele **coordena** agentes. A execução criativa é delegada a um `AgentRunner`
-(hoje o Claude Code). Se você quer um assistente que aprende com você e te atende no
-WhatsApp, isso é outra categoria de produto (ver Hermes, abaixo).
+### 1. Not an AI agent / personal assistant
+Norma does not chat, has no personality, does not "grow with you." It is not *the*
+agent — it **coordinates** agents. Creative execution is delegated to an `AgentRunner`
+(today, Claude Code). If you want an assistant that learns from you and reaches you on
+WhatsApp, that is a different product category (see Hermes, below).
 
-### 2. Não é uma biblioteca de "peças de Lego" para IA
-O Norma não é um kit genérico para você montar qualquer aplicação de LLM (RAG,
-chatbots, chains arbitrárias). Ele é **opinativo**: já é um fluxo pronto — uma esteira
-task-a-task com gates de review/QA. Não é uma caixa de ferramentas; é uma linha de
-montagem já configurada (ver LangChain, abaixo).
+### 2. Not a "Lego bricks" library for AI
+Norma is not a generic kit for building any LLM application (RAG, chatbots, arbitrary
+chains). It is **opinionated**: it is already a finished flow — a task-by-task line with
+review/QA gates. It is not a toolbox; it is an assembly line already configured (see
+LangChain, below).
 
-### 3. Não é um cockpit human-in-the-loop
-O Norma não tem — e não quer ter — uma UI rica para você pilotar vários agentes em
-paralelo, comparar diffs lado a lado e escolher o melhor merge. Ele é o oposto:
-*human-out-of-the-loop*. O valor dele está em rodar **sem** alguém sentado decidindo o
-próximo passo (ver Orca, abaixo).
+### 3. Not a human-in-the-loop cockpit
+Norma does not have — and does not want — a rich UI for you to pilot many agents in
+parallel, compare diffs side by side, and pick the best merge. It is the opposite:
+*human-out-of-the-loop*. Its value is running **without** someone sitting there deciding
+the next step (see Orca, below).
 
-### 4. Não deixa o LLM decidir o fluxo
-Esta é a fronteira mais importante. Frameworks de agentes costumam deixar o modelo
-decidir o próximo salto em runtime — flexível, porém imprevisível e difícil de auditar.
-O Norma faz o oposto **de propósito**: a decisão de fluxo é código puro. Trocamos
-flexibilidade por confiabilidade e rastreabilidade.
+### 4. It does not let the LLM decide the flow
+This is the most important boundary. Agent frameworks usually let the model decide the
+next hop at runtime — flexible, but unpredictable and hard to audit. Norma does the
+opposite **on purpose**: the flow decision is pure code. We trade flexibility for
+reliability and traceability.
 
-### 5. Não é o executor do trabalho
-O Norma não escreve o código, não revisa, não roda os testes. Isso é papel do agente
-dentro de cada task. O Norma decide **o quê** e **em que ordem** — o **como** não é com
-ele.
+### 5. Not the executor of the work
+Norma does not write the code, does not review it, does not run the tests. That is the
+agent's job inside each task. Norma decides **what** and **in what order** — the **how**
+is not its concern.
 
-### 6. Não gerencia memória/aprendizado de longo prazo
-Não há skills que evoluem, perfil de usuário ou busca em conversas passadas. O único
-"estado" que o Norma carrega entre tasks é o **handoff de contexto** (`@norma/context`:
-brief / PLAN / report). Aprendizado autônomo não é um objetivo.
+### 6. It does not manage long-term memory/learning
+There are no skills that evolve, no user profile, no search over past conversations. The
+only "state" Norma carries between tasks is the **context handoff** (`@norma/context`:
+brief / PLAN / report). Autonomous learning is not a goal.
 
-## Ferramentas frequentemente confundidas com o Norma
+## Tools frequently confused with Norma
 
-Todas orquestram ou executam agentes de alguma forma — mas cada uma vive numa camada
-diferente. **Nenhuma é concorrente direta do Norma**; várias são até complementares
-(podem inclusive rodar o mesmo Claude Code que o Norma usa como runner).
+They all orchestrate or execute agents in some form — but each lives in a different
+layer. **None is a direct competitor of Norma**; several are actually complementary
+(they can even run the same Claude Code that Norma uses as a runner).
 
 ### Hermes Agent (NousResearch)
-**O que é:** um agente de IA pessoal e auto-evolutivo — mesma categoria do Claude Code.
-Roda no seu terminal e em ~20 plataformas de mensagem, aprende com você (skills +
-memória + perfil), age no seu computador e melhora com o tempo.
+**What it is:** a personal, self-improving AI agent — same category as Claude Code. It
+runs in your terminal and across ~20 messaging platforms, learns from you (skills +
+memory + profile), acts on your computer, and improves over time.
 
-**Camada:** _runner_ de agente (o executor).
+**Layer:** agent _runner_ (the executor).
 
-**Diferença para o Norma:** o Hermes *é* o agente que faz o trabalho e decide seu
-próprio fluxo, aprendendo no caminho. O Norma está **acima** disso, decidindo por
-regras determinísticas qual trabalho fazer e em que ordem. O Hermes poderia, em tese,
-ser embrulhado como um `AgentRunner` do Norma.
+**Difference from Norma:** Hermes *is* the agent that does the work and decides its own
+flow, learning along the way. Norma sits **above** that, deciding — by deterministic
+rules — which work to do and in what order. Hermes could, in principle, be wrapped as a
+Norma `AgentRunner`.
 
 ### LangChain / LangGraph
-**O que é:** uma biblioteca genérica de componentes para construir aplicações de LLM
-(modelos, memória, RAG, tools, chains). O LangGraph adiciona orquestração de agentes com
-estado. Quem monta o fluxo é o desenvolvedor — e, com frequência, o LLM decide os saltos
-em runtime.
+**What it is:** a generic library of components for building LLM applications (models,
+memory, RAG, tools, chains). LangGraph adds stateful agent orchestration. The developer
+assembles the flow — and, often, the LLM decides the hops at runtime.
 
-**Camada:** _toolkit_ / framework de construção (a camada de baixo).
+**Layer:** _toolkit_ / building framework (the bottom layer).
 
-**Diferença para o Norma:** LangChain te dá as peças para *você* montar **qualquer**
-fluxo; o Norma **já é** um fluxo pronto e opinativo, com a decisão nas mãos de um motor
-determinístico. Você poderia até usar LangChain *dentro* de um `AgentRunner` do Norma.
-A sobreposição existe só no recorte "orquestração" (LangGraph) — e mesmo aí a aposta é
-oposta: flexibilidade (LLM decide) × determinismo (código decide).
+**Difference from Norma:** LangChain gives you the bricks to build **any** flow
+*yourself*; Norma **is already** a finished, opinionated flow, with the decision in the
+hands of a deterministic engine. You could even use LangChain *inside* a Norma
+`AgentRunner`. The overlap exists only in the "orchestration" slice (LangGraph) — and
+even there the bet is opposite: flexibility (LLM decides) × determinism (code decides).
 
-### Orca (stablyai/orca) — e ADEs de frota em geral
-**O que é:** um ambiente de desenvolvimento (desktop/mobile) para um humano pilotar
-vários agentes de código em paralelo, cada um em seu git worktree, comparando saídas,
-anotando diffs e escolhendo o merge. Explicitamente *human-in-the-loop*.
+### Orca (stablyai/orca) — and fleet ADEs in general
+**What it is:** a development environment (desktop/mobile) for a human to pilot many
+coding agents in parallel, each in its own git worktree, comparing outputs, annotating
+diffs, and choosing the merge. Explicitly *human-in-the-loop*.
 
-**Camada:** _cockpit_ para o humano (acima do agente, mas com você no centro).
+**Layer:** _cockpit_ for the human (above the agent, but with you at the center).
 
-**Diferença para o Norma:** o Orca **amplifica você** — te dá superpoderes para produzir
-mais rápido, com o julgamento humano no centro do loop. O Norma **substitui o operador**
-— tira você do loop de decisão para a esteira rodar sozinha (inclusive via cron), de
-forma previsível e auditável. Os dois ficam acima do agente de execução, mas o Orca te
-entrega o volante e o Norma guarda o volante para si.
+**Difference from Norma:** Orca **amplifies you** — it gives you superpowers to ship
+faster, with human judgment at the center of the loop. Norma **replaces the operator** —
+it takes you out of the decision loop so the line runs itself (including via cron), in a
+predictable and auditable way. Both sit above the execution agent, but Orca hands you the
+wheel while Norma keeps the wheel to itself.
 
-## Resumo de camadas
+## Layer summary
 
 ```
-   Humano no comando (cockpit)   ......  Orca (ADE / frota human-in-the-loop)
+   Human in command (cockpit)     ......  Orca (ADE / human-in-the-loop fleet)
             │
-   Decisão de fluxo               ......  Norma  ⚙️ determinístico  ×  LangGraph 🤖 LLM decide
+   Flow decision                  ......  Norma  ⚙️ deterministic  ×  LangGraph 🤖 LLM decides
             │
-   Execução da task (o agente)    ......  Claude Code · Hermes · Codex · …
+   Task execution (the agent)     ......  Claude Code · Hermes · Codex · …
             │
-   Peças de LLM (modelos/RAG/tools) ....  LangChain
+   LLM bricks (models/RAG/tools)  ......  LangChain
 ```
 
-O Norma ocupa **uma única faixa**: a decisão de fluxo, feita por código. Tudo abaixo
-(execução, peças) é delegado por portas & adapters; tudo acima (o humano dirigindo) é,
-por design, ausente.
+Norma occupies **a single band**: the flow decision, made by code. Everything below
+(execution, bricks) is delegated through ports & adapters; everything above (the human
+driving) is, by design, absent.
 
-## A régua para dizer "não"
+## The ruler for saying "no"
 
-Quando surgir a dúvida "o Norma deveria fazer X?", o teste é:
+When the question "should Norma do X?" comes up, the test is:
 
-1. **X é decidir _o quê_/_em que ordem_ a partir do estado das tasks?** → sim, é do
-   Norma (e deve ser determinístico, no motor).
-2. **X é _executar_ o trabalho de uma task?** → não é do Norma; é do `AgentRunner`.
-3. **X exige um humano no loop de decisão, ou uma UI para pilotar?** → não é do Norma.
-4. **X é uma capacidade genérica de LLM (memória, RAG, skills que evoluem)?** → não é do
-   Norma; no máximo entra como contexto via `@norma/context`.
+1. **Is X deciding _what_ / _in what order_ based on the state of the tasks?** → yes,
+   that is Norma's (and it must be deterministic, in the engine).
+2. **Is X _executing_ the work of a task?** → not Norma's; it is the `AgentRunner`'s.
+3. **Does X require a human in the decision loop, or a UI to pilot?** → not Norma's.
+4. **Is X a generic LLM capability (memory, RAG, evolving skills)?** → not Norma's; at
+   most it enters as context via `@norma/context`.
 
-Se X não passa no teste 1, provavelmente pertence a **outra camada** — e a resposta
-correta é um adapter/runner, não uma mudança no motor.
+If X does not pass test 1, it probably belongs to **another layer** — and the correct
+answer is an adapter/runner, not a change to the engine.
