@@ -15,7 +15,9 @@ everything specific is now **config + adapters**.
 > compares to tools it is often confused with (Hermes, LangChain/LangGraph, Orca), and
 > [`docs/WHY-DETERMINISTIC.md`](docs/WHY-DETERMINISTIC.md) for why a deterministic
 > orchestrator (token economy, predictability, auditability) beats an LLM-driven one on
-> already-determined pipelines.
+> already-determined pipelines, and [`docs/AGILE-MAPPING.md`](docs/AGILE-MAPPING.md) for
+> the engineering-squad mental model behind it (fixed roles, WIP limit, pull, review/QA
+> gates) and how it maps to agile/Kanban.
 
 ```
  intake ──► planner agent ──► tracker (project + tasks: DAG + qa-batches)
