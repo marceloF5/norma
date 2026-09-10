@@ -9,6 +9,7 @@ import { registerDoctor } from "./commands/doctor.js";
 import { registerEpic } from "./commands/epic.js";
 import { registerInit } from "./commands/init.js";
 import { openPullRequest, registerReport, writeEpicReport } from "./commands/report.js";
+import { registerWorktree } from "./commands/worktree.js";
 import {
   type ResolvedConfig,
   makeContext,
@@ -16,6 +17,7 @@ import {
   makeTracker,
   resolveConfig,
 } from "./factory.js";
+import { ensureWorktree } from "./git.js";
 
 interface GlobalOpts {
   config?: string;
@@ -78,12 +80,27 @@ program
   .option("--max-steps <n>", "safety cap on loop iterations", "100")
   .option("--dry-run", "plan only — no writes, no agent runs", false)
   .option("--pr", "on completion, open a PR with the generated report as its body", false)
+  .option("--auto-worktree", "create/reuse a git worktree for the epic and run agents in it", false)
   .action(
     async (
       projectId: string,
-      opts: { slug?: string; worktree?: string; maxSteps: string; dryRun: boolean; pr: boolean },
+      opts: {
+        slug?: string;
+        worktree?: string;
+        maxSteps: string;
+        dryRun: boolean;
+        pr: boolean;
+        autoWorktree: boolean;
+      },
     ) => {
       const r = await resolved();
+      let worktree = opts.worktree;
+      if (opts.autoWorktree) {
+        if (!opts.slug) throw new Error("--auto-worktree requires --slug");
+        const wt = await ensureWorktree({ repoRoot: r.root, slug: opts.slug });
+        worktree = wt.path;
+        console.error(`worktree: ${wt.path} (branch ${wt.branch})`);
+      }
       const orch = new Orchestrator({
         config: r.config,
         tracker: makeTracker(r.config),
@@ -94,7 +111,7 @@ program
       const result = await orch.runCycle({
         projectId,
         slug: opts.slug,
-        worktree: opts.worktree,
+        worktree,
         maxSteps: Number(opts.maxSteps),
         dryRun: opts.dryRun,
         onComplete: async ({ slug }) => {
@@ -104,7 +121,7 @@ program
           if (opts.pr) {
             const code = await openPullRequest(path, {
               title: `feat: ${s}`,
-              cwd: opts.worktree ?? r.root,
+              cwd: worktree ?? r.root,
             });
             console.error(
               code === 0 ? "   PR opened." : "   PR not opened (gh failed or no pushed branch).",
@@ -197,6 +214,7 @@ program
 registerInit(program, resolved);
 registerEpic(program, resolved);
 registerReport(program, resolved);
+registerWorktree(program, resolved);
 registerDoctor(program, resolved);
 registerAgents(program, resolved);
 
