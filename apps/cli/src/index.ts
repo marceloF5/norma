@@ -1,3 +1,5 @@
+import { appendFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { EchoRunner } from "@norma/agent-runtime";
 import { type NormaConfig, toPlanContext } from "@norma/config";
 import { Phase, computePlan } from "@norma/core";
@@ -9,6 +11,7 @@ import { registerDoctor } from "./commands/doctor.js";
 import { registerEpic } from "./commands/epic.js";
 import { registerInit } from "./commands/init.js";
 import { openPullRequest, registerReport, writeEpicReport } from "./commands/report.js";
+import { registerStatus } from "./commands/status.js";
 import { registerWorktree } from "./commands/worktree.js";
 import {
   type ResolvedConfig,
@@ -36,6 +39,17 @@ program
   )
   .option("--tracker <kind>", "override tracker kind (linear|jira|memory)")
   .option("--runtime <kind>", "override agent runtime (claude-code|echo)");
+
+/** Append a one-line JSON run record for observability (.norma/logs/runs.jsonl). */
+async function logRun(contextRoot: string, record: Record<string, unknown>): Promise<void> {
+  const path = join(contextRoot, "logs", "runs.jsonl");
+  await mkdir(dirname(path), { recursive: true });
+  await appendFile(
+    path,
+    `${JSON.stringify({ ts: new Date().toISOString(), ...record })}\n`,
+    "utf8",
+  );
+}
 
 /** Resolve config (discovery + overrides) shared by every command. */
 export async function resolved(): Promise<ResolvedConfig> {
@@ -129,6 +143,15 @@ program
           }
         },
       });
+      if (!opts.dryRun) {
+        await logRun(r.contextRoot, {
+          project: projectId,
+          slug: opts.slug,
+          steps: result.steps,
+          complete: result.complete,
+          executed: result.executed,
+        });
+      }
       console.log(
         JSON.stringify(
           {
@@ -214,6 +237,7 @@ program
 registerInit(program, resolved);
 registerEpic(program, resolved);
 registerReport(program, resolved);
+registerStatus(program, resolved);
 registerWorktree(program, resolved);
 registerDoctor(program, resolved);
 registerAgents(program, resolved);
