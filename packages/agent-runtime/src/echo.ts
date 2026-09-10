@@ -1,6 +1,7 @@
 import type { AgentOutcome, AgentRequest, AgentRunner, Verdict } from "./port.js";
 
 const GREEN: Record<AgentRequest["kind"], Verdict> = {
+  plan: "ok",
   dispatch: "ok",
   rework: "ok",
   review: "pass",

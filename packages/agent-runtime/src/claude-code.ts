@@ -46,6 +46,7 @@ export class ClaudeCodeRunner implements AgentRunner {
       "When done, output EXACTLY one line:",
       "  NORMA_VERDICT: <ok|pass|fail|approve|bounce|error>",
       "Semantics by stage:",
+      "  plan            → ok (wrote the epic plan JSON as instructed) or error",
       "  dispatch/rework → ok (green: lint+build+tests pass) or error",
       "  review          → pass or fail",
       "  qa              → approve or bounce",

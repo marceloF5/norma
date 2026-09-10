@@ -19,3 +19,11 @@ export type {
   RuntimeConfig,
 } from "./schema.js";
 export { softwareDevConfig } from "./presets/software-dev.js";
+export {
+  EpicPlanSchema,
+  EpicTaskSchema,
+  parseEpicPlan,
+  validateEpicPlan,
+  slugify,
+} from "./epic-plan.js";
+export type { EpicPlan, EpicTask } from "./epic-plan.js";

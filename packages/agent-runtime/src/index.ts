@@ -1,4 +1,4 @@
-export type { AgentRunner, AgentRequest, AgentOutcome, Verdict } from "./port.js";
+export type { AgentRunner, AgentRequest, AgentOutcome, AgentStageKind, Verdict } from "./port.js";
 export { EchoRunner } from "./echo.js";
 export type { EchoRunnerOptions } from "./echo.js";
 export { ClaudeCodeRunner } from "./claude-code.js";

@@ -6,6 +6,7 @@ import { MemoryTracker, type RawIssue, applyFor, normalize } from "@norma/tracke
 import { Command } from "commander";
 import { registerAgents } from "./commands/agents.js";
 import { registerDoctor } from "./commands/doctor.js";
+import { registerEpic } from "./commands/epic.js";
 import { registerInit } from "./commands/init.js";
 import {
   type ResolvedConfig,
@@ -180,6 +181,7 @@ program
 
 // Onboarding & maintenance commands (each registers itself on the program).
 registerInit(program, resolved);
+registerEpic(program, resolved);
 registerDoctor(program, resolved);
 registerAgents(program, resolved);
 

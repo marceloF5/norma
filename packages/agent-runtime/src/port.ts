@@ -1,9 +1,15 @@
 import type { Intent, TaskRef } from "@norma/core";
 
+/** The stages an agent runtime can be asked to perform. `plan` is the intake
+ * (decompose a demand into an epic plan); the rest map to engine intents. */
+export type AgentStageKind =
+  | Extract<Intent["kind"], "dispatch" | "review" | "rework" | "qa" | "escalate">
+  | "plan";
+
 /** What the orchestrator asks an agent to do for one intent. */
 export interface AgentRequest {
-  /** Which stage this is (dispatch | review | rework | qa | escalate). */
-  kind: Extract<Intent["kind"], "dispatch" | "review" | "rework" | "qa" | "escalate">;
+  /** Which stage this is (plan | dispatch | review | rework | qa | escalate). */
+  kind: AgentStageKind;
   /** The agent role to run (e.g. "api-engineer", "code-reviewer"). */
   role: string;
   /** Single task (dispatch/review/rework/escalate). */
