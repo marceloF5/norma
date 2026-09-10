@@ -21,3 +21,10 @@ export type {
   TrackerLabel,
 } from "./introspection.js";
 export { supportsIntrospection, canProvisionBoard } from "./introspection.js";
+export {
+  withRetry,
+  RetryableError,
+  isTransientStatus,
+  retryAfterMs,
+} from "./retry.js";
+export type { RetryOptions } from "./retry.js";

@@ -304,6 +304,9 @@ importers:
       '@norma/tsup-config':
         specifier: workspace:*
         version: link:../../tooling/tsup
+      '@types/node':
+        specifier: 22.10.5
+        version: 22.10.5
       tsup:
         specifier: 8.3.5
         version: 8.3.5(postcss@8.5.27)(tsx@4.19.2)(typescript@5.7.3)

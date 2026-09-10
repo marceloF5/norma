@@ -1,3 +1,5 @@
+import { RetryableError, isTransientStatus, retryAfterMs, withRetry } from "@norma/tracker";
+
 /** Minimal REST client for Jira Cloud (Basic auth: email + API token). */
 export class JiraRest {
   private auth: string;
@@ -11,20 +13,31 @@ export class JiraRest {
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
-      method,
-      headers: {
-        Authorization: this.auth,
-        Accept: "application/json",
-        ...(body ? { "Content-Type": "application/json" } : {}),
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    return withRetry(() => this.once<T>(method, path, body));
+  }
+
+  private async once<T>(method: string, path: string, body?: unknown): Promise<T> {
+    let res: Response;
+    try {
+      res = await fetch(`${this.baseUrl}${path}`, {
+        method,
+        headers: {
+          Authorization: this.auth,
+          Accept: "application/json",
+          ...(body ? { "Content-Type": "application/json" } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (e) {
+      throw new RetryableError(`Jira network error: ${e instanceof Error ? e.message : e}`);
+    }
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      throw new Error(
-        `Jira ${method} ${path} → ${res.status} ${res.statusText}: ${text.slice(0, 500)}`,
-      );
+      const msg = `Jira ${method} ${path} → ${res.status} ${res.statusText}: ${text.slice(0, 500)}`;
+      if (isTransientStatus(res.status)) {
+        throw new RetryableError(msg, retryAfterMs(res.headers.get("retry-after")));
+      }
+      throw new Error(msg);
     }
     if (res.status === 204) return undefined as T;
     const ct = res.headers.get("content-type") ?? "";

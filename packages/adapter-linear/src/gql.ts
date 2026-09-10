@@ -1,3 +1,5 @@
+import { RetryableError, isTransientStatus, retryAfterMs, withRetry } from "@norma/tracker";
+
 const API = "https://api.linear.app/graphql";
 
 export interface GqlResult<T> {
@@ -10,12 +12,25 @@ export class LinearGql {
   constructor(private readonly apiKey: string) {}
 
   async raw<T>(query: string, variables: Record<string, unknown> = {}): Promise<GqlResult<T>> {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: this.apiKey },
-      body: JSON.stringify({ query, variables }),
+    return withRetry(async () => {
+      let res: Response;
+      try {
+        res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: this.apiKey },
+          body: JSON.stringify({ query, variables }),
+        });
+      } catch (e) {
+        throw new RetryableError(`Linear network error: ${e instanceof Error ? e.message : e}`);
+      }
+      if (isTransientStatus(res.status)) {
+        throw new RetryableError(
+          `Linear HTTP ${res.status}`,
+          retryAfterMs(res.headers.get("retry-after")),
+        );
+      }
+      return (await res.json()) as GqlResult<T>;
     });
-    return (await res.json()) as GqlResult<T>;
   }
 
   /** Hard variant: throws on GraphQL errors. */
