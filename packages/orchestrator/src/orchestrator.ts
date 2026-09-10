@@ -279,13 +279,29 @@ export class Orchestrator {
         ])
       : [null, null];
     const raw = rawById.get(task.id);
+    const feedback =
+      stage === "rework" || stage === "escalate" ? await this.latestFeedback(task.id) : undefined;
     return composeHandoff({
       stage,
       brief,
       plan,
       worktree: input.worktree,
       tasks: [{ ...task, description: raw?.description }],
+      feedback,
     });
+  }
+
+  /** The most recent bounce comment (falls back to the last comment) for a task. */
+  private async latestFeedback(issueId: string): Promise<string | undefined> {
+    const list = this.deps.tracker.listComments;
+    if (!list) return undefined;
+    const comments = await list.call(this.deps.tracker, issueId);
+    if (!comments.length) return undefined;
+    const bounceRe = new RegExp(this.mapping().bounceMarker, "i");
+    const bounces = comments.filter((c) => bounceRe.test(c));
+    return (
+      (bounces.length ? bounces[bounces.length - 1] : comments[comments.length - 1]) ?? undefined
+    );
   }
 
   private async handoffBatch(

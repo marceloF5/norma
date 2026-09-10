@@ -92,6 +92,10 @@ export class MemoryTracker implements TrackerAdapter {
     this.comments.set(issueId, arr);
   }
 
+  async listComments(issueId: string): Promise<string[]> {
+    return [...(this.comments.get(issueId) ?? [])];
+  }
+
   async createProject(input: CreateProjectInput): Promise<{ id: string; url?: string }> {
     const id = `proj-${this.projects.size + 1}`;
     const url = `memory://project/${id}`;

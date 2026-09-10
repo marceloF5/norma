@@ -42,6 +42,19 @@ export class JiraRest {
   }
 }
 
+/** Flatten an Atlassian Document Format value to plain text (best-effort). */
+export function adfToText(doc: unknown): string {
+  const out: string[] = [];
+  const walk = (n: unknown) => {
+    if (!n || typeof n !== "object") return;
+    const node = n as { text?: string; content?: unknown[] };
+    if (typeof node.text === "string") out.push(node.text);
+    if (Array.isArray(node.content)) for (const c of node.content) walk(c);
+  };
+  walk(doc);
+  return out.join(" ").trim();
+}
+
 /** Build a minimal Atlassian Document Format doc from plain text. */
 export function adf(text: string) {
   return {

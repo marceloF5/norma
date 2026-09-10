@@ -34,6 +34,10 @@ export interface TrackerAdapter {
   /** Post a comment (used for bounce markers, escalation notes, PR links). */
   comment(issueId: string, body: string): Promise<void>;
 
+  /** Read an issue's comment bodies, oldest→newest. Optional; used to feed the
+   * last reviewer/QA feedback into a rework/escalate handoff. */
+  listComments?(issueId: string): Promise<string[]>;
+
   // --- intake / planning (used by /epic; optional for read-only trackers) ---
   createProject(input: CreateProjectInput): Promise<{ id: string; url?: string }>;
   createIssue(input: CreateIssueInput): Promise<{ id: string; ref: string; url?: string }>;

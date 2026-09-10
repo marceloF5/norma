@@ -211,6 +211,14 @@ export class LinearAdapter implements TrackerAdapter, TrackerIntrospection {
     );
   }
 
+  async listComments(issueId: string): Promise<string[]> {
+    const d = await this.gql.query<{ issue: { comments: { nodes: { body: string }[] } } }>(
+      `query($id:String!){ issue(id:$id){ comments{ nodes{ body } } } }`,
+      { id: issueId },
+    );
+    return d.issue.comments.nodes.map((c) => c.body);
+  }
+
   async createProject(input: CreateProjectInput): Promise<{ id: string; url?: string }> {
     const t = await this.team();
     const gqlInput: Record<string, unknown> = { name: input.name, teamIds: [t.id] };

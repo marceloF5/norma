@@ -70,6 +70,37 @@ describe("Orchestrator — full loop (memory tracker + echo runner)", () => {
     expect(result.executed.some((s) => s.kind === "escalate")).toBe(true);
   });
 
+  it("injects the last bounce comment into the rework handoff", async () => {
+    const tracker = new MemoryTracker({
+      bounceMarker: softwareDevConfig.phaseMapping.bounceMarker,
+      seed: [
+        {
+          id: "iss-1",
+          ref: "MEM-1",
+          title: "API endpoint",
+          state: "In Progress",
+          labels: ["agent:api", "changes-requested", "qa-batch:1"],
+          blockedBy: [],
+          order: 1,
+        },
+      ],
+    });
+    await tracker.comment("iss-1", "🔁 bounce by review: missing Zod schema on the body");
+
+    let reworkContext = "";
+    const runner = new EchoRunner({
+      decide: (req: AgentRequest) => {
+        if (req.kind === "rework") reworkContext = req.context;
+        return undefined;
+      },
+    });
+    const orch = new Orchestrator({ config: softwareDevConfig, tracker, runner });
+    await orch.runCycle({ projectId: "p1", maxSteps: 3 });
+
+    expect(reworkContext).toContain("Prior feedback");
+    expect(reworkContext).toContain("missing Zod schema");
+  });
+
   it("dry-run plans without mutating the tracker", async () => {
     const tracker = new MemoryTracker({ seed: seedEpic() });
     const orch = new Orchestrator({

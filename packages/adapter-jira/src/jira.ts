@@ -9,7 +9,7 @@ import type {
   TrackerLabel,
   TrackerState,
 } from "@norma/tracker";
-import { JiraRest, adf } from "./rest.js";
+import { JiraRest, adf, adfToText } from "./rest.js";
 
 export interface JiraAdapterOptions {
   /** Site base URL, e.g. https://acme.atlassian.net. Defaults to $JIRA_BASE_URL. */
@@ -169,6 +169,13 @@ export class JiraAdapter implements TrackerAdapter, TrackerIntrospection {
 
   async comment(issueId: string, body: string): Promise<void> {
     await this.rest.post(`/rest/api/3/issue/${issueId}/comment`, { body: adf(body) });
+  }
+
+  async listComments(issueId: string): Promise<string[]> {
+    const d = await this.rest.get<{ comments: { body: unknown }[] }>(
+      `/rest/api/3/issue/${issueId}/comment`,
+    );
+    return (d.comments ?? []).map((c) => adfToText(c.body));
   }
 
   async createProject(input: CreateProjectInput): Promise<{ id: string; url?: string }> {
