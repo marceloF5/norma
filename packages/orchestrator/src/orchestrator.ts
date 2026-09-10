@@ -163,6 +163,8 @@ export class Orchestrator {
           worktree: input.worktree,
           context,
         });
+        if (out.verdict === "pending")
+          return { kind: "dispatch", ref: a.task.ref, verdict: "pending" };
         if (out.verdict === "ok") {
           await t.transition(a.task.id, this.applyOf(a.onDone.toPhase));
         } else {
@@ -183,6 +185,8 @@ export class Orchestrator {
           worktree: input.worktree,
           context,
         });
+        if (out.verdict === "pending")
+          return { kind: "review", ref: a.task.ref, verdict: "pending" };
         if (out.verdict === "pass") {
           await t.transition(a.task.id, this.applyOf(a.onPass.toPhase));
         } else {
@@ -205,6 +209,8 @@ export class Orchestrator {
           worktree: input.worktree,
           context,
         });
+        if (out.verdict === "pending")
+          return { kind: "rework", ref: a.task.ref, verdict: "pending" };
         if (out.verdict === "ok") {
           await t.transition(a.task.id, this.applyOf(a.onDone.toPhase));
         } else {
@@ -226,6 +232,8 @@ export class Orchestrator {
           worktree: input.worktree,
           context,
         });
+        if (out.verdict === "pending")
+          return { kind: "escalate", ref: a.task.ref, verdict: "pending" };
         await t.comment(a.task.id, `escalation: ${out.summary}`);
         return { kind: "escalate", ref: a.task.ref, verdict: out.verdict };
       }
@@ -243,6 +251,7 @@ export class Orchestrator {
           worktree: input.worktree,
           context,
         });
+        if (out.verdict === "pending") return { kind: "qa", batch: a.batch, verdict: "pending" };
         if (out.verdict === "approve") {
           for (const task of a.tasks)
             await t.transition(task.id, this.applyOf(a.onApprove.toPhase));

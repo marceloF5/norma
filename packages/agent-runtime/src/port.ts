@@ -32,8 +32,10 @@ export interface AgentRequest {
  *  - review          → "pass" | "fail"
  *  - qa              → "approve" | "bounce" (with `bounced`)
  *  - escalate        → "ok" (re-scoped; principal relabels) | "error"
+ *  - "pending"       → work is not done yet (async/human runtime); the orchestrator
+ *                      leaves the task in place so a later cycle re-attempts it.
  */
-export type Verdict = "ok" | "pass" | "fail" | "approve" | "bounce" | "error";
+export type Verdict = "ok" | "pass" | "fail" | "approve" | "bounce" | "error" | "pending";
 
 export interface AgentOutcome {
   verdict: Verdict;

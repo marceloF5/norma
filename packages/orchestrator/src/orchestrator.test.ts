@@ -101,6 +101,33 @@ describe("Orchestrator — full loop (memory tracker + echo runner)", () => {
     expect(reworkContext).toContain("missing Zod schema");
   });
 
+  it("leaves a task untouched when a stage returns pending (async/human)", async () => {
+    const tracker = new MemoryTracker({
+      bounceMarker: softwareDevConfig.phaseMapping.bounceMarker,
+      seed: [
+        {
+          id: "iss-1",
+          ref: "MEM-1",
+          title: "API endpoint",
+          state: "In Review",
+          labels: ["agent:api", "needs-review", "qa-batch:1"],
+          blockedBy: [],
+          order: 1,
+        },
+      ],
+    });
+    const runner = new EchoRunner({
+      decide: (req: AgentRequest) => (req.kind === "review" ? "pending" : undefined),
+    });
+    const orch = new Orchestrator({ config: softwareDevConfig, tracker, runner });
+    const result = await orch.runCycle({ projectId: "p1", maxSteps: 5 });
+
+    // Task stays in needs-review; no transition happened.
+    const [issue] = await tracker.listIssues({ projectId: "p1" });
+    expect(issue?.labels).toContain("needs-review");
+    expect(result.executed.some((s) => s.kind === "review" && s.verdict === "pending")).toBe(true);
+  });
+
   it("dry-run plans without mutating the tracker", async () => {
     const tracker = new MemoryTracker({ seed: seedEpic() });
     const orch = new Orchestrator({

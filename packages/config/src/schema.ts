@@ -78,7 +78,7 @@ export const TrackerSchema = z
 /** Which agent runtime executes the roles. */
 export const RuntimeSchema = z
   .object({
-    kind: z.enum(["claude-code", "echo"]).default("claude-code"),
+    kind: z.enum(["claude-code", "echo", "command", "human"]).default("claude-code"),
     options: z.record(z.string(), z.unknown()).default({}),
   })
   .strict();

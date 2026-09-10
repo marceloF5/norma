@@ -1,5 +1,10 @@
 export type { AgentRunner, AgentRequest, AgentOutcome, AgentStageKind, Verdict } from "./port.js";
+export { parseVerdict, verdictContract } from "./parse.js";
 export { EchoRunner } from "./echo.js";
 export type { EchoRunnerOptions } from "./echo.js";
 export { ClaudeCodeRunner } from "./claude-code.js";
 export type { ClaudeCodeRunnerOptions } from "./claude-code.js";
+export { CommandRunner } from "./command.js";
+export type { CommandRunnerOptions } from "./command.js";
+export { HumanRunner } from "./human.js";
+export type { HumanRunnerOptions } from "./human.js";

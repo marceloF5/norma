@@ -115,10 +115,11 @@ program
         worktree = wt.path;
         console.error(`worktree: ${wt.path} (branch ${wt.branch})`);
       }
+      const tracker = makeTracker(r.config);
       const orch = new Orchestrator({
         config: r.config,
-        tracker: makeTracker(r.config),
-        runner: makeRunner(r.config, r.agentsDir),
+        tracker,
+        runner: makeRunner(r.config, r.agentsDir, tracker),
         context: makeContext(r.contextRoot),
         logger: (m) => console.error(m),
       });

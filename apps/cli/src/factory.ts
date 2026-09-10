@@ -2,7 +2,13 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { JiraAdapter } from "@norma/adapter-jira";
 import { LinearAdapter } from "@norma/adapter-linear";
-import { type AgentRunner, ClaudeCodeRunner, EchoRunner } from "@norma/agent-runtime";
+import {
+  type AgentRunner,
+  ClaudeCodeRunner,
+  CommandRunner,
+  EchoRunner,
+  HumanRunner,
+} from "@norma/agent-runtime";
 import { type NormaConfig, parseConfig, softwareDevConfig } from "@norma/config";
 import { FsContextStore } from "@norma/context";
 import { MemoryTracker, type TrackerAdapter } from "@norma/tracker";
@@ -93,13 +99,33 @@ export function makeTracker(config: NormaConfig): TrackerAdapter {
 }
 
 /** Build an agent runner from config, wiring the agents dir for the Claude Code runtime. */
-export function makeRunner(config: NormaConfig, agentsDir?: string): AgentRunner {
+export function makeRunner(
+  config: NormaConfig,
+  agentsDir?: string,
+  tracker?: TrackerAdapter,
+): AgentRunner {
   const o = config.runtime.options as Record<string, unknown>;
   switch (config.runtime.kind) {
     case "claude-code":
       return new ClaudeCodeRunner({ model: o.model as string | undefined, agentsDir });
     case "echo":
       return new EchoRunner();
+    case "command": {
+      if (!o.command) throw new Error("runtime 'command' requires options.command");
+      return new CommandRunner({
+        command: o.command as string,
+        args: o.args as string[] | undefined,
+      });
+    }
+    case "human": {
+      if (!tracker?.listComments) {
+        throw new Error("runtime 'human' requires a tracker that supports listComments");
+      }
+      return new HumanRunner({
+        readComments: (id) => tracker.listComments!(id),
+        postComment: (id, body) => tracker.comment(id, body),
+      });
+    }
     default:
       throw new Error(`Unknown runtime kind: ${config.runtime.kind}`);
   }
