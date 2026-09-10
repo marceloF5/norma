@@ -8,6 +8,7 @@ import { registerAgents } from "./commands/agents.js";
 import { registerDoctor } from "./commands/doctor.js";
 import { registerEpic } from "./commands/epic.js";
 import { registerInit } from "./commands/init.js";
+import { openPullRequest, registerReport, writeEpicReport } from "./commands/report.js";
 import {
   type ResolvedConfig,
   makeContext,
@@ -76,10 +77,11 @@ program
   .option("--worktree <path>", "worktree path handed to agents")
   .option("--max-steps <n>", "safety cap on loop iterations", "100")
   .option("--dry-run", "plan only — no writes, no agent runs", false)
+  .option("--pr", "on completion, open a PR with the generated report as its body", false)
   .action(
     async (
       projectId: string,
-      opts: { slug?: string; worktree?: string; maxSteps: string; dryRun: boolean },
+      opts: { slug?: string; worktree?: string; maxSteps: string; dryRun: boolean; pr: boolean },
     ) => {
       const r = await resolved();
       const orch = new Orchestrator({
@@ -95,8 +97,20 @@ program
         worktree: opts.worktree,
         maxSteps: Number(opts.maxSteps),
         dryRun: opts.dryRun,
-        onComplete: ({ slug }) =>
-          console.error(`✅ epic complete${slug ? ` (${slug})` : ""} — generate report + open PR`),
+        onComplete: async ({ slug }) => {
+          const s = slug ?? projectId;
+          const { path } = await writeEpicReport(r, projectId, s);
+          console.error(`✅ epic complete (${s}) — report: ${path}`);
+          if (opts.pr) {
+            const code = await openPullRequest(path, {
+              title: `feat: ${s}`,
+              cwd: opts.worktree ?? r.root,
+            });
+            console.error(
+              code === 0 ? "   PR opened." : "   PR not opened (gh failed or no pushed branch).",
+            );
+          }
+        },
       });
       console.log(
         JSON.stringify(
@@ -182,6 +196,7 @@ program
 // Onboarding & maintenance commands (each registers itself on the program).
 registerInit(program, resolved);
 registerEpic(program, resolved);
+registerReport(program, resolved);
 registerDoctor(program, resolved);
 registerAgents(program, resolved);
 
