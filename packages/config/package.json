@@ -11,6 +11,10 @@
     "./presets/software-dev": {
       "types": "./src/presets/software-dev.ts",
       "import": "./src/presets/software-dev.ts"
+    },
+    "./presets/content": {
+      "types": "./src/presets/content.ts",
+      "import": "./src/presets/content.ts"
     }
   },
   "publishConfig": {

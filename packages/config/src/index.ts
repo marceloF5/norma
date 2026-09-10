@@ -19,6 +19,7 @@ export type {
   RuntimeConfig,
 } from "./schema.js";
 export { softwareDevConfig } from "./presets/software-dev.js";
+export { contentConfig } from "./presets/content.js";
 export {
   EpicPlanSchema,
   EpicTaskSchema,

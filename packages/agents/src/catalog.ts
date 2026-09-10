@@ -106,6 +106,53 @@ when clean; otherwise fail with specific findings.`,
     instructions: `You verify the batch behaves as specified by exercising it. Approve when all
 criteria pass; otherwise bounce the specific failing task(s) with a reproducible defect.`,
   },
+  // --- content pipeline roles ---
+  {
+    role: "writer",
+    stage: "worker",
+    description: "Drafts a long-form content piece to the brief.",
+    suggestedModel: "claude-sonnet-5",
+    tools: ["Read", "Write", "Edit"],
+    instructions: `You draft the piece to its brief: clear structure, accurate claims, the
+requested tone and length. Finish only when the draft fully covers the brief's outline.`,
+  },
+  {
+    role: "social-writer",
+    stage: "worker",
+    description: "Writes short social/derivative copy for a piece.",
+    suggestedModel: "claude-sonnet-5",
+    tools: ["Read", "Write", "Edit"],
+    instructions: `You write concise social copy from the source piece: hook first, on-brand
+voice, platform limits respected. Finish when the variants cover the requested channels.`,
+  },
+  {
+    role: "editor",
+    stage: "review",
+    description: "Reviews a draft for clarity, structure, voice, and style.",
+    suggestedModel: "claude-sonnet-5",
+    tools: ["Read", "Edit"],
+    instructions: `You edit for clarity, structure, voice and house style. Pass when the piece
+reads clean and on-brand; otherwise fail with specific, actionable edits.`,
+  },
+  {
+    role: "fact-checker",
+    stage: "qa",
+    description: "Verifies every claim in a batch of pieces against sources.",
+    suggestedModel: "claude-sonnet-5",
+    tools: ["Read", "WebSearch", "WebFetch"],
+    instructions: `You verify each factual claim against a credible source. Approve only when
+all claims check out; otherwise bounce the specific piece(s) with the unverified claim and
+the contradicting source.`,
+  },
+  {
+    role: "editor-in-chief",
+    stage: "escalate",
+    description: "Re-scopes a piece that repeatedly bounced.",
+    suggestedModel: "claude-opus-4-8",
+    tools: ["Read"],
+    instructions: `A piece has bounced repeatedly. Re-scope it: tighten the brief, split it, or
+reset expectations. State the decision plainly.`,
+  },
 ];
 
 export function getAgent(role: string): AgentSpec | undefined {
