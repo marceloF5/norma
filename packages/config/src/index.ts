@@ -20,6 +20,7 @@ export type {
 } from "./schema.js";
 export { softwareDevConfig } from "./presets/software-dev.js";
 export { contentConfig } from "./presets/content.js";
+export { githubConfig } from "./presets/github.js";
 export {
   EpicPlanSchema,
   EpicTaskSchema,

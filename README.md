@@ -66,6 +66,7 @@ engine change.
 | **`@norma/tracker`** | The `TrackerAdapter` port, the declarative normalizer, and an in-memory adapter. |
 | **`@norma/adapter-linear`** | `TrackerAdapter` over the Linear GraphQL API. |
 | **`@norma/adapter-jira`** | `TrackerAdapter` over the Jira Cloud REST API. |
+| **`@norma/adapter-github`** | `TrackerAdapter` over GitHub Issues (epic = milestone; phases in labels; DAG via `blocked-by:` labels). |
 | **`@norma/agent-runtime`** | The `AgentRunner` port + a Claude Code runner (`claude -p`) and an offline echo runner. |
 | **`@norma/agents`** | Runtime-neutral `AgentSpec`, the pre-established agent catalog, and Markdown (de)serialization. |
 | **`@norma/context`** | The `ContextStore` (durable brief / PLAN / report) + the handoff prompt composer. |

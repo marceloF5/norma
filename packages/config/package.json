@@ -15,6 +15,10 @@
     "./presets/content": {
       "types": "./src/presets/content.ts",
       "import": "./src/presets/content.ts"
+    },
+    "./presets/github": {
+      "types": "./src/presets/github.ts",
+      "import": "./src/presets/github.ts"
     }
   },
   "publishConfig": {

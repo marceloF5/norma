@@ -69,7 +69,7 @@ export const PhaseMappingSchema = z
 /** Which tracker backs this harness, plus its connection options. */
 export const TrackerSchema = z
   .object({
-    kind: z.enum(["linear", "jira", "memory"]),
+    kind: z.enum(["linear", "jira", "github", "memory"]),
     /** Adapter-specific options (team key, project prefix, base URL…). */
     options: z.record(z.string(), z.unknown()).default({}),
   })

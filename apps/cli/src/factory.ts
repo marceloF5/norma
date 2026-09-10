@@ -1,5 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { GitHubAdapter } from "@norma/adapter-github";
 import { JiraAdapter } from "@norma/adapter-jira";
 import { LinearAdapter } from "@norma/adapter-linear";
 import {
@@ -91,6 +92,8 @@ export function makeTracker(config: NormaConfig): TrackerAdapter {
         projectKey: o.projectKey as string | undefined,
         bounceMarker,
       });
+    case "github":
+      return new GitHubAdapter({ repo: o.repo as string | undefined, bounceMarker });
     case "memory":
       return new MemoryTracker({ bounceMarker });
     default:

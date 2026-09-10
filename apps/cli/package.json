@@ -24,6 +24,7 @@
     "commander": "12.1.0"
   },
   "devDependencies": {
+    "@norma/adapter-github": "workspace:*",
     "@norma/adapter-jira": "workspace:*",
     "@norma/adapter-linear": "workspace:*",
     "@norma/agent-runtime": "workspace:*",

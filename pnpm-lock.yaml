@@ -36,6 +36,9 @@ importers:
         specifier: 12.1.0
         version: 12.1.0
     devDependencies:
+      '@norma/adapter-github':
+        specifier: workspace:*
+        version: link:../../packages/adapter-github
       '@norma/adapter-jira':
         specifier: workspace:*
         version: link:../../packages/adapter-jira
@@ -78,6 +81,31 @@ importers:
       tsx:
         specifier: 4.19.2
         version: 4.19.2
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@22.10.5)
+
+  packages/adapter-github:
+    dependencies:
+      '@norma/tracker':
+        specifier: workspace:*
+        version: link:../tracker
+    devDependencies:
+      '@norma/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      '@norma/tsup-config':
+        specifier: workspace:*
+        version: link:../../tooling/tsup
+      '@types/node':
+        specifier: 22.10.5
+        version: 22.10.5
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(postcss@8.5.27)(tsx@4.19.2)(typescript@5.7.3)
       typescript:
         specifier: 5.7.3
         version: 5.7.3
