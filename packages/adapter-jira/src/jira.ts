@@ -236,6 +236,13 @@ export class JiraAdapter implements TrackerAdapter, TrackerIntrospection {
     return [...seen.values()];
   }
 
+  /** Jira labels are freeform — they exist implicitly on first use, so "creating"
+   * one is a no-op. (Status creation is workflow-scheme/admin managed and is NOT
+   * automated; `norma init` prints manual guidance for missing statuses instead.) */
+  async createLabel(input: { name: string }): Promise<TrackerLabel> {
+    return { id: input.name, name: input.name };
+  }
+
   async listLabels(): Promise<TrackerLabel[]> {
     const out: TrackerLabel[] = [];
     let startAt = 0;

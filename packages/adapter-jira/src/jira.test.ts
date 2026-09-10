@@ -145,4 +145,10 @@ describe("JiraAdapter introspection", () => {
     const labels = await a.listLabels();
     expect(labels.map((l) => l.name)).toEqual(["needs-qa", "agent:api"]);
   });
+
+  it("createLabel is a no-op (Jira labels are freeform)", async () => {
+    install(() => undefined);
+    const label = await adapter().createLabel({ name: "agent:api" });
+    expect(label).toEqual({ id: "agent:api", name: "agent:api" });
+  });
 });

@@ -273,11 +273,26 @@ async function runInit(flags: InitFlags): Promise<void> {
   parseConfig(config); // throws if invalid
 
   // --- provision missing board states/labels -------------------------------
-  if (trackerKind !== "memory") {
+  if (trackerKind !== "memory" && states.length) {
     try {
       const adapter = makeAdapter(trackerKind, trackerOptions);
       if (canProvisionBoard(adapter) && supportsIntrospection(adapter)) {
         await provision(adapter, slots, flags.yes);
+      } else {
+        // Read-only board (e.g. Jira statuses are admin-managed): guide manual setup.
+        const have = new Set(states.map((s) => s.name.toLowerCase()));
+        const missing = statesUsed(slots).filter((s) => !have.has(s.toLowerCase()));
+        if (missing.length) {
+          p.note(
+            [
+              "This tracker can't create statuses automatically. Add these columns/",
+              "statuses to your board so the pipeline can move cards:",
+              ...missing.map((s) => `  • ${s}`),
+              "(Labels are created automatically or on first use.)",
+            ].join("\n"),
+            "Manual board setup needed",
+          );
+        }
       }
     } catch {
       /* provisioning is best-effort */
