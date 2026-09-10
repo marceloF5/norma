@@ -1,10 +1,14 @@
 {
   "name": "@norma/cli",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Norma — provider-agnostic orchestration for AI agent pipelines (CLI).",
   "type": "module",
   "bin": {
     "norma": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",
@@ -12,10 +16,14 @@
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "prepack": "tsup"
   },
   "dependencies": {
     "@clack/prompts": "0.9.1",
+    "commander": "12.1.0"
+  },
+  "devDependencies": {
     "@norma/adapter-jira": "workspace:*",
     "@norma/adapter-linear": "workspace:*",
     "@norma/agent-runtime": "workspace:*",
@@ -25,9 +33,6 @@
     "@norma/core": "workspace:*",
     "@norma/orchestrator": "workspace:*",
     "@norma/tracker": "workspace:*",
-    "commander": "12.1.0"
-  },
-  "devDependencies": {
     "@norma/tsconfig": "workspace:*",
     "@norma/tsup-config": "workspace:*",
     "@types/node": "22.10.5",

@@ -32,7 +32,7 @@ const program = new Command();
 program
   .name("norma")
   .description("Norma — provider-agnostic orchestration for AI agent pipelines")
-  .version("0.0.0")
+  .version("0.1.0")
   .option(
     "-c, --config <path>",
     "path to a norma config JSON (default: discover norma.config.json)",

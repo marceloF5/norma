@@ -86,6 +86,20 @@ pnpm test          # engine, normalizer, mapping, agents & the full loop
 pnpm --filter @norma/cli exec tsx src/index.ts demo
 ```
 
+### Install the `norma` CLI globally
+
+`@norma/cli` bundles the whole workspace into a self-contained binary, so it packs
+and installs anywhere:
+
+```bash
+pnpm --filter @norma/cli build
+TGZ=$(cd apps/cli && npm pack | tail -1)   # → apps/cli/norma-cli-<version>.tgz
+npm i -g "apps/cli/$TGZ"                    # provides the `norma` command
+norma demo
+```
+
+(Once published to a registry, this becomes `npm i -g @norma/cli`.)
+
 ## Onboarding — `norma init`
 
 Install Norma into an existing project with one interactive command. It connects to
