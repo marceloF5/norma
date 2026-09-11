@@ -86,6 +86,7 @@ export class GitHubAdapter implements TrackerAdapter, TrackerIntrospection {
       if (batch.length < 100) break;
     }
     const stateByNumber = new Map(raw.map((i) => [i.number, i.state]));
+    const labelsByNumber = new Map(raw.map((i) => [i.number, i.labels.map((l) => l.name)]));
     const out: RawIssue[] = [];
     for (const i of raw) {
       const labels = i.labels.map((l) => l.name);
@@ -94,7 +95,14 @@ export class GitHubAdapter implements TrackerAdapter, TrackerIntrospection {
         .filter((m): m is RegExpMatchArray => m !== null)
         .map((m) => {
           const num = Number(m[1]);
-          return { id: String(num), ref: `#${num}`, state: stateByNumber.get(num) ?? "open" };
+          // Phases are label-driven on GitHub, so the blocker must carry its labels
+          // for correct dep-done classification.
+          return {
+            id: String(num),
+            ref: `#${num}`,
+            state: stateByNumber.get(num) ?? "open",
+            labels: labelsByNumber.get(num) ?? [],
+          };
         });
       out.push({
         id: String(i.number),

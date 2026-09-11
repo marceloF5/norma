@@ -3,6 +3,13 @@ export interface RawDependency {
   id: string;
   ref: string;
   state: string;
+  /**
+   * The blocker's labels, when the adapter can supply them. Required for
+   * label-driven pipelines (e.g. GitHub, where phases live in labels, not state)
+   * so the blocker classifies to the right phase. Omit when state alone is exact
+   * (Linear/Jira, where released/done/canceled are distinct states).
+   */
+  labels?: string[];
 }
 
 /**

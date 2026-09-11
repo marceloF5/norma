@@ -53,9 +53,10 @@ export function normalize(raw: RawIssue[], mapping: PhaseMapping): NormalizedTas
     bounces: r.bounces ?? 0,
     blockedBy: r.blockedBy.map((b) => ({
       ref: b.ref,
-      // Blockers are classified by state alone (labels unavailable across the edge);
-      // the dep-done phases (released/done/canceled) are all state-only, so this is exact.
-      phase: classifyPhase(b.state, [], mapping),
+      // Classify the blocker from its state AND labels when the adapter supplies
+      // them (required for label-driven pipelines like GitHub); state-only is exact
+      // for trackers where released/done/canceled are distinct states.
+      phase: classifyPhase(b.state, b.labels ?? [], mapping),
     })),
     order: r.order,
   }));

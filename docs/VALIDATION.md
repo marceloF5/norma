@@ -4,29 +4,21 @@ Norma's adapters are unit-tested offline with mocked `fetch` (locking request/re
 shapes). This document tracks validation against **live** provider APIs, which requires
 real credentials.
 
-## GitHub — read path ✅ (2026-09-10)
+## GitHub — full read + write path ✅ (2026-09-11)
 
-Validated against the real `marceloF5/norma` repo using the `gh` CLI token:
+Validated end-to-end against the real `marceloF5/norma` repo using the `gh` CLI token:
 
-```bash
-export GITHUB_TOKEN=$(gh auth token)
-node apps/cli/dist/index.js --config <github.config with repo=marceloF5/norma> whoami
-# → { tracker: "github", id, name, context: { repo: "marceloF5/norma" } }
-```
+- **Read:** `whoami`, `listStates`, `listLabels`, `listIssues`, `plan`, `status`.
+- **Write:** `norma epic --plan-file` created a milestone + 2 issues (labels + a
+  `blocked-by` DAG edge); `norma cycle --runtime echo` drove the whole epic
+  promote → dispatch → review → qa → released for both tasks (respecting the DAG),
+  ending `complete: true`. Throwaway milestone/issues/label were cleaned up after.
 
-`whoami`, `listStates`, and `listLabels` all succeeded against the live API, exercising
-auth, the REST client, retry wrapper, and response parsing.
-
-**Not yet run (create/transition write path):** creating a milestone + issues, moving a
-card, and adding a `blocked-by` label mutate the real repo, so they're gated on explicit
-approval. When ready:
-
-```bash
-export GITHUB_TOKEN=$(gh auth token) GITHUB_REPO=<owner/repo>
-norma --config examples/github.config.json epic --plan-file <plan.json>   # creates milestone + issues
-norma --config examples/github.config.json status <milestone-number>
-# then clean up the throwaway milestone/issues
-```
+**Bug found & fixed by this run:** on GitHub, phases live in labels (released = open +
+`qa-approved`), but the normalizer classified a blocker from its *state* alone — so a
+released blocker read as "backlog" and its dependent never unblocked. `RawDependency`
+now carries the blocker's `labels`, and the GitHub adapter supplies them
+(`normalize` classifies with state + labels). Covered by a regression test.
 
 ## Linear / Jira — pending credentials
 

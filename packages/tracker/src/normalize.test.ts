@@ -1,4 +1,4 @@
-import { softwareDevConfig } from "@norma/config";
+import { githubConfig, softwareDevConfig } from "@norma/config";
 import { Phase } from "@norma/core";
 import { describe, expect, it } from "vitest";
 import { MemoryTracker } from "./memory.js";
@@ -53,6 +53,23 @@ describe("normalize — full issue", () => {
     expect(tasks[1]?.owner).toBe("web");
     expect(tasks[1]?.batch).toBe("qa-batch:1");
     expect(tasks[1]?.blockedBy[0]?.phase).toBe(Phase.RELEASED);
+  });
+
+  it("classifies a label-driven blocker (GitHub: released = open + qa-approved)", () => {
+    const gh = githubConfig.phaseMapping;
+    const raw: RawIssue[] = [
+      {
+        id: "b",
+        ref: "#2",
+        title: "web",
+        state: "open",
+        labels: ["agent:web", "blocked-by:1"],
+        blockedBy: [{ id: "1", ref: "#1", state: "open", labels: ["qa-approved"] }],
+        order: 2,
+      },
+    ];
+    // State alone ("open") would be backlog; with the blocker's labels it's released.
+    expect(normalize(raw, gh)[0]?.blockedBy[0]?.phase).toBe(Phase.RELEASED);
   });
 });
 
