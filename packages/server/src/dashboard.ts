@@ -9,9 +9,12 @@ export const DASHBOARD_HTML = /* html */ `<!doctype html>
 <title>Norma — live</title>
 <style>
   :root {
-    --bg: #0b0e14; --panel: #131824; --line: #232a3a; --text: #e6e9f0; --muted: #8a93a6;
-    --backlog:#5b6472; --ready:#3b82f6; --in_progress:#f59e0b; --needs_rework:#ef4444;
-    --needs_review:#a855f7; --needs_qa:#14b8a6; --released:#22c55e; --done:#15803d; --canceled:#4b5563;
+    /* shadcn "stone" (neutral) dark tokens */
+    --bg: oklch(0.145 0 0); --panel: oklch(0.205 0 0); --line: oklch(1 0 0 / 10%);
+    --text: oklch(0.985 0 0); --muted: oklch(0.708 0 0);
+    --primary: oklch(0.922 0 0); --primary-fg: oklch(0.205 0 0);
+    --backlog:#78716c; --ready:#3b82f6; --in_progress:#f59e0b; --needs_rework:#ef4444;
+    --needs_review:#a855f7; --needs_qa:#14b8a6; --released:#22c55e; --done:#15803d; --canceled:#57534e;
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--text); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
@@ -21,7 +24,7 @@ export const DASHBOARD_HTML = /* html */ `<!doctype html>
   .spacer { flex:1; }
   button { background:#1c2333; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 12px; cursor:pointer; font-size:13px; }
   button:hover { border-color:#39415a; }
-  button.primary { background:var(--ready); border-color:var(--ready); color:#04122b; font-weight:600; }
+  button.primary { background:var(--primary); border-color:var(--primary); color:var(--primary-fg); font-weight:600; }
   #status { color:var(--muted); font-size:13px; }
   #status b { color:var(--text); }
   .cols { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(150px,1fr); gap:0; padding:0 8px; }
