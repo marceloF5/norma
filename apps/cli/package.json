@@ -33,6 +33,7 @@
     "@norma/context": "workspace:*",
     "@norma/core": "workspace:*",
     "@norma/orchestrator": "workspace:*",
+    "@norma/server": "workspace:*",
     "@norma/tracker": "workspace:*",
     "@norma/tsconfig": "workspace:*",
     "@norma/tsup-config": "workspace:*",

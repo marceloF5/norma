@@ -15,3 +15,7 @@ coverage/
 
 # OS
 .DS_Store
+
+# playwright / scratch screenshots
+.playwright-mcp/
+norma-dash-*.png

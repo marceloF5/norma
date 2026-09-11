@@ -11,6 +11,7 @@ import { registerDoctor } from "./commands/doctor.js";
 import { registerEpic } from "./commands/epic.js";
 import { registerInit } from "./commands/init.js";
 import { openPullRequest, registerReport, writeEpicReport } from "./commands/report.js";
+import { registerServe } from "./commands/serve.js";
 import { registerStatus } from "./commands/status.js";
 import { registerWorktree } from "./commands/worktree.js";
 import {
@@ -239,6 +240,7 @@ registerInit(program, resolved);
 registerEpic(program, resolved);
 registerReport(program, resolved);
 registerStatus(program, resolved);
+registerServe(program, resolved);
 registerWorktree(program, resolved);
 registerDoctor(program, resolved);
 registerAgents(program, resolved);

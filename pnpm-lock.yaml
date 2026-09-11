@@ -63,6 +63,9 @@ importers:
       '@norma/orchestrator':
         specifier: workspace:*
         version: link:../../packages/orchestrator
+      '@norma/server':
+        specifier: workspace:*
+        version: link:../../packages/server
       '@norma/tracker':
         specifier: workspace:*
         version: link:../../packages/tracker
@@ -298,6 +301,43 @@ importers:
         specifier: workspace:*
         version: link:../tracker
     devDependencies:
+      '@norma/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      '@norma/tsup-config':
+        specifier: workspace:*
+        version: link:../../tooling/tsup
+      '@types/node':
+        specifier: 22.10.5
+        version: 22.10.5
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(postcss@8.5.27)(tsx@4.19.2)(typescript@5.7.3)
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@22.10.5)
+
+  packages/server:
+    dependencies:
+      '@norma/config':
+        specifier: workspace:*
+        version: link:../config
+      '@norma/core':
+        specifier: workspace:*
+        version: link:../core
+      '@norma/orchestrator':
+        specifier: workspace:*
+        version: link:../orchestrator
+      '@norma/tracker':
+        specifier: workspace:*
+        version: link:../tracker
+    devDependencies:
+      '@norma/agent-runtime':
+        specifier: workspace:*
+        version: link:../agent-runtime
       '@norma/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig

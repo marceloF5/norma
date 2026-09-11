@@ -134,6 +134,29 @@ export class Orchestrator {
     };
   }
 
+  /**
+   * Execute exactly ONE action from the current plan (or none if idle/complete),
+   * then return the plan it acted on. Ideal for a live, step-by-step view: call it
+   * on a tick and watch a single task change phase. `runCycle` = `step` to a fixed point.
+   */
+  async step(input: RunCycleInput): Promise<{ plan: Plan; executed: ExecutedStep | null }> {
+    const planCtx = toPlanContext(this.deps.config);
+    const raw = await this.deps.tracker.listIssues({ projectId: input.projectId });
+    const rawById = new Map(raw.map((r) => [r.id, r]));
+    const tasks = normalize(raw, this.mapping());
+    const plan = computePlan(tasks, planCtx);
+    if (plan.actionCount === 0) return { plan, executed: null };
+
+    const action = plan.actions[0] as Intent;
+    if (action.kind === "complete") {
+      if (!input.dryRun)
+        await input.onComplete?.({ projectId: input.projectId, slug: input.slug, plan });
+      return { plan, executed: { kind: "complete" } };
+    }
+    const executed = await this.execute(action, { input, rawById });
+    return { plan, executed };
+  }
+
   private async execute(
     action: Exclude<Intent, CompleteIntent>,
     ctx: { input: RunCycleInput; rawById: Map<string, RawIssue> },
