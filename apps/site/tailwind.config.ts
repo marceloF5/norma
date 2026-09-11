@@ -1,3 +1,4 @@
+import typography from "@tailwindcss/typography";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -32,5 +33,5 @@ export default {
       borderRadius: { lg: "var(--radius)", md: "var(--radius)", sm: "var(--radius)" },
     },
   },
-  plugins: [],
+  plugins: [typography],
 } satisfies Config;

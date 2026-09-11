@@ -5,5 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-  server: { port: 4682 },
+  server: {
+    port: 4682,
+    // allow importing the repo-root docs/*.md via ?raw (single source of truth)
+    fs: { allow: ["..", "../.."] },
+  },
 });

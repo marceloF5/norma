@@ -1,12 +1,12 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, Boxes, GitBranch, Github, ListChecks, Radio, ShieldCheck } from "lucide-react";
 import { Pipeline } from "@/components/Pipeline";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 
 const REPO = "https://github.com/marceloF5/norma";
-const DOCS = `${REPO}/tree/main/docs`;
 
-export function App() {
+export function Landing() {
   return (
     <div className="min-h-screen font-sans">
       <Nav />
@@ -37,7 +37,7 @@ function Nav() {
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground sm:flex">
           <a href="#how" className="transition-colors hover:text-foreground">How it works</a>
           <a href="#stack" className="transition-colors hover:text-foreground">Integrations</a>
-          <a href={DOCS} className="transition-colors hover:text-foreground">Docs</a>
+          <Link to="/docs" className="transition-colors hover:text-foreground">Docs</Link>
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="icon" aria-label="GitHub">
@@ -246,7 +246,7 @@ function Quickstart() {
             </p>
             <p className="mt-2 font-mono text-sm" style={{ color: "var(--brand)" }}>norma serve --demo</p>
             <div className="mt-6 flex gap-3">
-              <Button asChild variant="outline"><a href={DOCS}>Read the docs</a></Button>
+              <Button asChild variant="outline"><Link to="/docs">Read the docs</Link></Button>
               <Button asChild variant="ghost"><a href={REPO}><Github /> GitHub</a></Button>
             </div>
           </Reveal>
@@ -282,7 +282,7 @@ function Footer() {
         <nav className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
           <a href="#how" className="hover:text-foreground">How it works</a>
           <a href="#stack" className="hover:text-foreground">Integrations</a>
-          <a href={DOCS} className="hover:text-foreground">Docs</a>
+          <Link to="/docs" className="hover:text-foreground">Docs</Link>
           <a href={REPO} className="hover:text-foreground">GitHub</a>
         </nav>
       </div>
