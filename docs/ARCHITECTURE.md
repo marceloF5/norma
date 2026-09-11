@@ -55,6 +55,40 @@ holds all state, and any run recomputes the exact next steps. It is unit-tested 
 `packages/core/src/plan.test.ts`; the full loop (with the in-memory tracker and echo
 runner) is tested in `packages/orchestrator/src/orchestrator.test.ts`.
 
+## Canonical phases (the seam)
+
+The engine reasons over provider-agnostic **phases**, never a tracker's state names:
+
+```
+backlog → ready → in_progress → needs_review → needs_qa → released → done
+                        ↑______ needs_rework ______|         (canceled = side exit)
+```
+
+Each adapter's **normalizer** maps a raw issue `(state, labels)` onto one phase — and a
+phase transition back onto `(state, labels)` writes — using a declarative
+**phaseMapping** in config. That single indirection is what makes the core open to any
+tracker: to support a new one you write an adapter (API calls) + a mapping (data). No
+engine change.
+
+## Packages
+
+| Package | Responsibility |
+|---|---|
+| `@norma/core` | The pure engine (`computePlan`), canonical `Phase`, domain types, intents. Zero I/O. |
+| `@norma/config` | Zod-validated pipeline definition (roles, gates, policy, phase mapping) + presets (`software-dev`, `content`, `github`). |
+| `@norma/tracker` | The `TrackerAdapter` port, the declarative normalizer, retry helper, and an in-memory adapter. |
+| `@norma/adapter-linear` | `TrackerAdapter` over the Linear GraphQL API. |
+| `@norma/adapter-jira` | `TrackerAdapter` over the Jira Cloud REST API. |
+| `@norma/adapter-github` | `TrackerAdapter` over GitHub Issues (epic = milestone; phases in labels; DAG via `blocked-by:` labels). |
+| `@norma/agent-runtime` | The `AgentRunner` port + runtimes: `claude-code`, `command`, `human`, `echo`. |
+| `@norma/agents` | Runtime-neutral `AgentSpec`, the pre-established agent catalog, and Markdown (de)serialization. |
+| `@norma/context` | The `ContextStore` (durable brief / PLAN / report) + the handoff prompt composer. |
+| `@norma/orchestrator` | The operator loop: plan → execute → write-back → re-plan, to a fixed point. |
+| `@norma/cli` (`norma`) | `init · epic · cycle · status · report · complete · doctor · agents · worktree · whoami · demo`. |
+
+Ports & adapters throughout: swap the tracker, the agent runtime, or the pipeline
+definition independently — the engine and orchestrator never change.
+
 ## Action order (per plan)
 
 1. **qa** — a batch whose members are all settled, ≥1 pending → run QA.
