@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { EchoRunner } from "@norma/agent-runtime";
 import { createNormaServer } from "@norma/server";
 import { MemoryTracker, type RawIssue } from "@norma/tracker";
@@ -5,6 +7,14 @@ import type { Command } from "commander";
 import { type ResolvedConfig, makeContext, makeRunner, makeTracker } from "../factory.js";
 
 type Resolver = () => Promise<ResolvedConfig>;
+
+/** Locate a built web client (apps/web/dist) to serve the shadcn SPA, if present. */
+function findWebDist(explicit?: string): string | undefined {
+  const candidates = [explicit, resolve(process.cwd(), "apps/web/dist")].filter(
+    Boolean,
+  ) as string[];
+  return candidates.find((c) => existsSync(resolve(c, "index.html")));
+}
 
 const DEMO_SEED: RawIssue[] = [
   {
@@ -46,13 +56,15 @@ export function registerServe(program: Command, resolved: Resolver): void {
     .option("--port <n>", "port", "4680")
     .option("--slug <slug>", "epic slug for durable context")
     .option("--worktree <path>", "worktree handed to agents")
+    .option("--web <dir>", "path to a built web client (apps/web/dist) to serve the shadcn SPA")
     .action(
       async (
         projectId: string | undefined,
-        opts: { demo: boolean; port: string; slug?: string; worktree?: string },
+        opts: { demo: boolean; port: string; slug?: string; worktree?: string; web?: string },
       ) => {
         const r = await resolved();
         const port = Number(opts.port);
+        const webDist = findWebDist(opts.web);
 
         let server: ReturnType<typeof createNormaServer>;
         if (opts.demo) {
@@ -65,6 +77,7 @@ export function registerServe(program: Command, resolved: Resolver): void {
             tracker,
             runner: new EchoRunner(),
             projectId: "demo",
+            webDist,
           });
         } else {
           if (!projectId) throw new Error("provide a projectId (or use --demo)");
@@ -74,6 +87,7 @@ export function registerServe(program: Command, resolved: Resolver): void {
             tracker,
             runner: makeRunner(r.config, r.agentsDir, tracker),
             context: makeContext(r.contextRoot),
+            webDist,
             projectId,
             slug: opts.slug,
             worktree: opts.worktree,
