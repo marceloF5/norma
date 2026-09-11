@@ -73,6 +73,18 @@ norma cycle <projectId> --slug referral-tiers            # advance one cycle
 
 Config is auto-discovered from `norma.config.json`; point elsewhere with `--config`.
 
+## Watch it live
+
+```bash
+norma serve --demo        # offline: seeded epic + echo agents, open http://localhost:4680
+norma serve <projectId>   # against your tracker
+```
+
+A live dashboard lays your tasks out in columns by phase and **animates them as the
+epic runs** — highlighting what's in flight and what's next. `norma serve` ships a
+zero-dependency page; `apps/web` is the richer client (React + shadcn/ui + TanStack)
+that talks to the same API.
+
 ## Works with your stack
 
 - **Trackers:** Linear · Jira · GitHub Issues · in-memory (offline). Adding one is an

@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* shadcn/ui — "stone" base color */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --primary: 24 9.8% 10%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 9.8% 10%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 20 14.3% 4.1%;
+    --radius: 0.5rem;
+
+    --phase-backlog: 25 5% 55%;
+    --phase-ready: 217 91% 60%;
+    --phase-in_progress: 38 92% 50%;
+    --phase-needs_rework: 0 84% 60%;
+    --phase-needs_review: 271 81% 56%;
+    --phase-needs_qa: 173 80% 40%;
+    --phase-released: 142 71% 45%;
+    --phase-done: 142 64% 30%;
+  }
+
+  .dark {
+    --background: 24 12% 2.8%;
+    --foreground: 60 9.1% 97.8%;
+    --card: 24 10% 5.5%;
+    --card-foreground: 60 9.1% 97.8%;
+    --primary: 60 9.1% 97.8%;
+    --primary-foreground: 24 9.8% 10%;
+    --secondary: 20 8% 10%;
+    --secondary-foreground: 60 9.1% 97.8%;
+    --muted: 20 8% 10%;
+    --muted-foreground: 24 5% 55%;
+    --accent: 20 8% 12%;
+    --accent-foreground: 60 9.1% 97.8%;
+    --border: 20 7% 11%;
+    --input: 20 7% 11%;
+    --ring: 24 5.7% 70%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+}
