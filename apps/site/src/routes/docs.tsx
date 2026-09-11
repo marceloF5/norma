@@ -1,8 +1,8 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
-import { Pipeline } from "@/components/Pipeline";
 import { Callout } from "@/components/docs/Callout";
+import { PhaseFlow } from "@/components/docs/PhaseFlow";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { Tabs } from "@/components/docs/Tabs";
 import { Toc } from "@/components/docs/Toc";
@@ -86,12 +86,10 @@ export function DocsIndex() {
           The loop
         </h2>
         <p className="mt-3 text-muted-foreground">
-          Every task flows through phases. The engine promotes, dispatches, reviews and QAs — one
-          task in flight per lane, QA batched. Watch it move:
+          Every task flows through provider-agnostic phases. The engine promotes, dispatches, reviews
+          and QAs — one task in flight per lane, QA batched:
         </p>
-        <div className="mt-4">
-          <Pipeline />
-        </div>
+        <PhaseFlow />
 
         <h2 id={slugifyHeading("Install")} className="mt-14 scroll-mt-24 border-b border-border pb-2 font-display text-2xl font-bold">
           1 · Install

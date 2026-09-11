@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { ArchitectureDiagram } from "@/components/docs/ArchitectureDiagram";
 import { Callout } from "@/components/docs/Callout";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { PhaseFlow } from "@/components/docs/PhaseFlow";
 import { mdHrefToRoute } from "@/docs";
 import { slugifyHeading } from "@/lib/utils";
 
@@ -56,9 +57,12 @@ export function Markdown({ children }: { children: string }) {
             const cls: string = codeEl?.props?.className ?? "";
             const lang = /language-(\w+)/.exec(cls)?.[1];
             const code = toText(codeEl?.props?.children);
-            // Swap the ports-&-adapters ASCII art for a graphical diagram on the site.
+            // Swap key ASCII diagrams for graphical components on the site.
             if (code.includes("computePlan (PURE") && code.includes("adapter-linear")) {
               return <ArchitectureDiagram />;
+            }
+            if (code.includes("needs_rework") && code.includes("released → done")) {
+              return <PhaseFlow />;
             }
             return <CodeBlock code={code} lang={lang} />;
           },
