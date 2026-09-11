@@ -106,14 +106,21 @@ npm i -g "apps/cli/$(cd apps/cli && npm pack | tail -1)"   # provides `norma`
 
 ## Docs
 
+- **[Getting started](docs/GETTING-STARTED.md)** — install → init → epic → cycle → ship.
 - [Architecture](docs/ARCHITECTURE.md) — the engine, the phase model, packages, and the
   mapping from the original harness.
 - [Why deterministic](docs/WHY-DETERMINISTIC.md) · [Agile mapping](docs/AGILE-MAPPING.md)
   · [Positioning](docs/POSITIONING.md) · [Live validation](docs/VALIDATION.md)
-- Autonomous runs (cron + sandbox): see `tooling/`.
+- Full index: [docs/](docs/README.md). Autonomous runs (cron + sandbox): see `tooling/`.
+
+## Apps
+
+- `apps/cli` — the `norma` command.
+- `apps/web` — the live dashboard (React + shadcn/ui + TanStack), served by `norma serve`.
+- `apps/site` — the product/landing site (**norma.team**).
 
 ## Status
 
-Extracted and generalized from a working autonomous dev harness. 11 packages, ~80 tests,
+Extracted and generalized from a working autonomous dev harness. 14 packages, ~84 tests,
 CI green. GitHub is validated end-to-end against a live repo; Linear/Jira are unit-tested
 against mocked APIs and pending a live run (see [validation](docs/VALIDATION.md)).
