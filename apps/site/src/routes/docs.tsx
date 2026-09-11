@@ -1,8 +1,8 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
+import { AnimatedPhaseFlow } from "@/components/docs/AnimatedPhaseFlow";
 import { Callout } from "@/components/docs/Callout";
-import { PhaseFlow } from "@/components/docs/PhaseFlow";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { Tabs } from "@/components/docs/Tabs";
 import { Toc } from "@/components/docs/Toc";
@@ -89,7 +89,7 @@ export function DocsIndex() {
           Every task flows through provider-agnostic phases. The engine promotes, dispatches, reviews
           and QAs — one task in flight per lane, QA batched:
         </p>
-        <PhaseFlow />
+        <AnimatedPhaseFlow />
 
         <h2 id={slugifyHeading("Install")} className="mt-14 scroll-mt-24 border-b border-border pb-2 font-display text-2xl font-bold">
           1 · Install
