@@ -3,6 +3,7 @@
 import agileMapping from "../../../docs/AGILE-MAPPING.md?raw";
 import architecture from "../../../docs/ARCHITECTURE.md?raw";
 import gettingStarted from "../../../docs/GETTING-STARTED.md?raw";
+import models from "../../../docs/MODELS.md?raw";
 import positioning from "../../../docs/POSITIONING.md?raw";
 import validation from "../../../docs/VALIDATION.md?raw";
 import whyDeterministic from "../../../docs/WHY-DETERMINISTIC.md?raw";
@@ -18,6 +19,7 @@ export const DOCS: Doc[] = [
   { slug: "getting-started", title: "Getting started", blurb: "Install → init → epic → cycle → ship.", content: gettingStarted },
   { slug: "architecture", title: "Architecture", blurb: "The engine, phases, and packages.", content: architecture },
   { slug: "why-deterministic", title: "Why deterministic", blurb: "Why a pure engine drives orchestration.", content: whyDeterministic },
+  { slug: "models", title: "Model selection", blurb: "Norma selects the model; the runtime accesses it.", content: models },
   { slug: "agile-mapping", title: "Agile mapping", blurb: "The engineering-squad mental model.", content: agileMapping },
   { slug: "positioning", title: "Positioning", blurb: "What Norma is — and isn't.", content: positioning },
   { slug: "validation", title: "Validation", blurb: "Live-API status per adapter.", content: validation },
@@ -33,6 +35,7 @@ export function mdHrefToRoute(href: string): string | null {
     "GETTING-STARTED": "getting-started",
     ARCHITECTURE: "architecture",
     "WHY-DETERMINISTIC": "why-deterministic",
+    MODELS: "models",
     "AGILE-MAPPING": "agile-mapping",
     POSITIONING: "positioning",
     VALIDATION: "validation",

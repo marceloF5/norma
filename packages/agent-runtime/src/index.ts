@@ -2,8 +2,12 @@ export type { AgentRunner, AgentRequest, AgentOutcome, AgentStageKind, Verdict }
 export { parseVerdict, verdictContract } from "./parse.js";
 export { EchoRunner } from "./echo.js";
 export type { EchoRunnerOptions } from "./echo.js";
+export { CliAgentRunner } from "./cli-agent.js";
+export type { CliAgentConfig } from "./cli-agent.js";
 export { ClaudeCodeRunner } from "./claude-code.js";
 export type { ClaudeCodeRunnerOptions } from "./claude-code.js";
+export { OpenCodeRunner } from "./opencode.js";
+export type { OpenCodeRunnerOptions } from "./opencode.js";
 export { CommandRunner } from "./command.js";
 export type { CommandRunnerOptions } from "./command.js";
 export { HumanRunner } from "./human.js";

@@ -9,6 +9,7 @@ import {
   CommandRunner,
   EchoRunner,
   HumanRunner,
+  OpenCodeRunner,
 } from "@norma/agent-runtime";
 import { type NormaConfig, parseConfig, softwareDevConfig } from "@norma/config";
 import { FsContextStore } from "@norma/context";
@@ -111,6 +112,8 @@ export function makeRunner(
   switch (config.runtime.kind) {
     case "claude-code":
       return new ClaudeCodeRunner({ model: o.model as string | undefined, agentsDir });
+    case "opencode":
+      return new OpenCodeRunner({ model: o.model as string | undefined, agentsDir });
     case "echo":
       return new EchoRunner();
     case "command": {
