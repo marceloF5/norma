@@ -89,9 +89,10 @@ that talks to the same API.
 
 - **Trackers:** Linear · Jira · GitHub Issues · in-memory (offline). Adding one is an
   adapter + a mapping — no engine change.
-- **Agent runtimes:** Claude Code · any command/script · humans (review/QA by comment) ·
-  echo (offline). The agent *definition* is separate from *how it runs*, so switching
-  runtimes touches nothing else.
+- **Agent runtimes:** Claude Code · OpenCode (multi-provider) · any command/script ·
+  humans (review/QA by comment) · echo (offline). The agent *definition* is separate from
+  *how it runs*, so switching runtimes touches nothing else. Norma *selects* the model;
+  the runtime *accesses* it → [model selection](docs/MODELS.md).
 - **Pipelines:** ships a `software-dev` preset (and `content`, `github`); write your own
   as config.
 
@@ -109,8 +110,9 @@ npm i -g "apps/cli/$(cd apps/cli && npm pack | tail -1)"   # provides `norma`
 - **[Getting started](docs/GETTING-STARTED.md)** — install → init → epic → cycle → ship.
 - [Architecture](docs/ARCHITECTURE.md) — the engine, the phase model, packages, and the
   mapping from the original harness.
-- [Why deterministic](docs/WHY-DETERMINISTIC.md) · [Agile mapping](docs/AGILE-MAPPING.md)
-  · [Positioning](docs/POSITIONING.md) · [Live validation](docs/VALIDATION.md)
+- [Why deterministic](docs/WHY-DETERMINISTIC.md) · [Model selection](docs/MODELS.md) ·
+  [Agile mapping](docs/AGILE-MAPPING.md) · [Positioning](docs/POSITIONING.md) ·
+  [Live validation](docs/VALIDATION.md)
 - Full index: [docs/](docs/README.md). Autonomous runs (cron + sandbox): see `tooling/`.
 
 ## Apps

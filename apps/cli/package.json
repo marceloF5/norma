@@ -3,10 +3,36 @@
   "version": "0.1.0",
   "description": "Norma — provider-agnostic orchestration for AI agent pipelines (CLI).",
   "type": "module",
+  "license": "MIT",
+  "author": "Marcelo Fortunato",
+  "homepage": "https://github.com/marceloF5/norma#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marceloF5/norma.git",
+    "directory": "apps/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/marceloF5/norma/issues"
+  },
+  "keywords": [
+    "ai-agents",
+    "orchestration",
+    "agent-orchestration",
+    "linear",
+    "jira",
+    "github-issues",
+    "claude-code",
+    "opencode",
+    "workflow",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "bin": {
     "norma": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md"],
   "publishConfig": {
     "access": "public"
   },
