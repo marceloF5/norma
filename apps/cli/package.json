@@ -30,7 +30,7 @@
     "node": ">=20"
   },
   "bin": {
-    "norma": "./dist/index.js"
+    "norma": "dist/index.js"
   },
   "files": ["dist", "README.md"],
   "publishConfig": {
