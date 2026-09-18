@@ -84,7 +84,7 @@ engine change.
 | `@norma/agents` | Runtime-neutral `AgentSpec`, the pre-established agent catalog, and Markdown (de)serialization. |
 | `@norma/context` | The `ContextStore` (durable brief / PLAN / report) + the handoff prompt composer. |
 | `@norma/orchestrator` | The operator loop: plan → execute → write-back → re-plan, to a fixed point. |
-| `@norma/cli` (`norma`) | `init · epic · cycle · status · report · complete · doctor · agents · worktree · whoami · demo`. |
+| `@norma-team/cli` (`norma`) | `init · epic · cycle · status · report · complete · doctor · agents · worktree · whoami · demo`. |
 
 Ports & adapters throughout: swap the tracker, the agent runtime, or the pipeline
 definition independently — the engine and orchestrator never change.

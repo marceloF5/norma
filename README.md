@@ -32,7 +32,7 @@ No credentials needed — this runs the whole loop against an in-memory board:
 ```bash
 pnpm install
 pnpm build
-pnpm --filter @norma/cli exec tsx src/index.ts demo
+pnpm --filter @norma-team/cli exec tsx src/index.ts demo
 ```
 
 ## Set it up on your project
@@ -98,11 +98,11 @@ that talks to the same API.
 
 ## Install the CLI globally
 
-`@norma/cli` bundles the whole workspace into a self-contained binary:
+`@norma-team/cli` is published to npm as a self-contained binary (the whole workspace
+bundled in) — install it and you get the `norma` command:
 
 ```bash
-pnpm --filter @norma/cli build
-npm i -g "apps/cli/$(cd apps/cli && npm pack | tail -1)"   # provides `norma`
+npm i -g @norma-team/cli
 ```
 
 ## Docs
@@ -124,5 +124,6 @@ npm i -g "apps/cli/$(cd apps/cli && npm pack | tail -1)"   # provides `norma`
 ## Status
 
 Extracted and generalized from a working autonomous dev harness. 14 packages, ~84 tests,
-CI green. GitHub is validated end-to-end against a live repo; Linear/Jira are unit-tested
-against mocked APIs and pending a live run (see [validation](docs/VALIDATION.md)).
+CI green. Published to npm as `@norma-team/cli`. GitHub, **Linear, and Jira are all
+validated end-to-end against live APIs** — connect, introspect, provision, create, and run
+a full cycle (see [validation](docs/VALIDATION.md)).

@@ -1,5 +1,5 @@
 {
-  "name": "@norma/cli",
+  "name": "@norma-team/cli",
   "version": "0.1.0",
   "description": "Norma — provider-agnostic orchestration for AI agent pipelines (CLI).",
   "type": "module",

@@ -14,10 +14,10 @@ only does the creative work of one task at a time.** Same dependency graph, same
 ## Install
 
 ```bash
-npm i -g @norma/cli     # provides the `norma` command
+npm i -g @norma-team/cli     # provides the `norma` command
 ```
 
-`@norma/cli` is a self-contained binary — the whole engine, adapters, and runtimes are
+`@norma-team/cli` is a self-contained binary — the whole engine, adapters, and runtimes are
 bundled in.
 
 ## Try it in 30 seconds

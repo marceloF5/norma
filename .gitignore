@@ -19,3 +19,4 @@ coverage/
 # playwright / scratch screenshots
 .playwright-mcp/
 norma-dash-*.png
+apps/cli/.npmrc
