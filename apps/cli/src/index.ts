@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { appendFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { EchoRunner } from "@norma/agent-runtime";
@@ -28,6 +29,11 @@ import { ensureWorktree } from "./git.js";
 // don't have to be exported by hand on every command.
 loadDotenv();
 
+// Single source of version: read package.json (resolves in dev and in the published pkg).
+const { version: VERSION } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+) as { version: string };
+
 interface GlobalOpts {
   config?: string;
   tracker?: string;
@@ -38,7 +44,7 @@ const program = new Command();
 program
   .name("norma")
   .description("Norma — provider-agnostic orchestration for AI agent pipelines")
-  .version("0.1.1")
+  .version(VERSION)
   .option(
     "-c, --config <path>",
     "path to a norma config JSON (default: discover norma.config.json)",
