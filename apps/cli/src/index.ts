@@ -14,6 +14,7 @@ import { openPullRequest, registerReport, writeEpicReport } from "./commands/rep
 import { registerServe } from "./commands/serve.js";
 import { registerStatus } from "./commands/status.js";
 import { registerWorktree } from "./commands/worktree.js";
+import { loadDotenv } from "./env.js";
 import {
   type ResolvedConfig,
   makeContext,
@@ -22,6 +23,10 @@ import {
   resolveConfig,
 } from "./factory.js";
 import { ensureWorktree } from "./git.js";
+
+// Load .env / .env.local from the project so credentials (LINEAR_API_KEY, etc.)
+// don't have to be exported by hand on every command.
+loadDotenv();
 
 interface GlobalOpts {
   config?: string;
@@ -33,7 +38,7 @@ const program = new Command();
 program
   .name("norma")
   .description("Norma — provider-agnostic orchestration for AI agent pipelines")
-  .version("0.1.0")
+  .version("0.1.1")
   .option(
     "-c, --config <path>",
     "path to a norma config JSON (default: discover norma.config.json)",

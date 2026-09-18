@@ -1,6 +1,6 @@
 {
   "name": "@norma-team/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Norma — provider-agnostic orchestration for AI agent pipelines (CLI).",
   "type": "module",
   "license": "MIT",

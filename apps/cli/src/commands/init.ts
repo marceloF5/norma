@@ -13,6 +13,7 @@ import {
   supportsIntrospection,
 } from "@norma/tracker";
 import type { Command } from "commander";
+import { ensureGitignoreEnv, saveEnv } from "../env.js";
 import { CONFIG_FILENAME, type ResolvedConfig, findConfigPath } from "../factory.js";
 import {
   type BoardSlots,
@@ -46,6 +47,34 @@ const bail = (msg: string): never => {
 function check<T>(value: T | symbol): T {
   if (p.isCancel(value)) bail("Cancelled.");
   return value as T;
+}
+
+/**
+ * Make sure a credential env var is available for this run. If it's not set and
+ * we're interactive, prompt for it (masked by default), export it into
+ * `process.env` so introspection works now, and record it so we can persist it.
+ */
+async function ensureSecret(
+  envName: string,
+  label: string,
+  flags: InitFlags,
+  collected: Record<string, string>,
+  masked = true,
+): Promise<void> {
+  if (process.env[envName]) return;
+  if (flags.yes) {
+    p.log.warn(`${envName} not set — export it (or add it to .env) to enable live access.`);
+    return;
+  }
+  const val = check(
+    masked
+      ? await p.password({ message: `${label} (${envName})` })
+      : await p.text({ message: `${label} (${envName})` }),
+  ) as string;
+  if (val) {
+    process.env[envName] = val;
+    collected[envName] = val;
+  }
 }
 
 /** Build the tracker adapter from the collected options, for introspection. */
@@ -122,6 +151,7 @@ async function runInit(flags: InitFlags): Promise<void> {
       );
 
   const trackerOptions: Record<string, string | undefined> = {};
+  const secrets: Record<string, string> = {};
   if (trackerKind === "linear") {
     trackerOptions.team = flags.yes
       ? (flags.team ?? process.env.LINEAR_TEAM ?? "Redisco")
@@ -131,8 +161,7 @@ async function runInit(flags: InitFlags): Promise<void> {
             initialValue: flags.team ?? process.env.LINEAR_TEAM ?? "",
           }),
         );
-    if (!process.env.LINEAR_API_KEY)
-      p.log.warn("LINEAR_API_KEY not set — set it to enable board introspection and runs.");
+    await ensureSecret("LINEAR_API_KEY", "Linear API key", flags, secrets);
   } else if (trackerKind === "jira") {
     trackerOptions.baseUrl = flags.yes
       ? (flags.baseUrl ?? process.env.JIRA_BASE_URL)
@@ -150,6 +179,8 @@ async function runInit(flags: InitFlags): Promise<void> {
             initialValue: flags.projectKey ?? process.env.JIRA_PROJECT ?? "",
           }),
         );
+    await ensureSecret("JIRA_EMAIL", "Jira account email", flags, secrets, false);
+    await ensureSecret("JIRA_API_TOKEN", "Jira API token", flags, secrets);
   }
 
   // --- introspect the board ------------------------------------------------
@@ -310,12 +341,31 @@ async function runInit(flags: InitFlags): Promise<void> {
   const specs = dedupeByRole(roles.map(([role, stage]) => specForRole(role, stage)));
   const written = await writeAgents(agentsDir, specs);
 
+  // Persist any prompted credentials to a gitignored .env so future runs pick them up.
+  let envLine: string | null = null;
+  if (Object.keys(secrets).length) {
+    const save = flags.yes
+      ? true
+      : check(
+          await p.confirm({
+            message: `Save ${Object.keys(secrets).join(", ")} to .env (gitignored)?`,
+            initialValue: true,
+          }),
+        );
+    if (save) {
+      const envPath = saveEnv(root, secrets);
+      ensureGitignoreEnv(root);
+      envLine = `secrets: ${Object.keys(secrets).join(", ")} → ${envPath} (gitignored)`;
+    }
+  }
+
   p.note(
     [
       `config:  ${configPath}`,
       `agents:  ${written.length} file(s) in ${agentsDir}`,
       `tracker: ${trackerKind}  ·  runtime: ${runtimeKind}`,
       `workers: ${workers.join(", ")}`,
+      ...(envLine ? [envLine] : []),
     ].join("\n"),
     "Generated",
   );

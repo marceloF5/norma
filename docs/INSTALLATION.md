@@ -70,8 +70,16 @@ the engine is healthy and you're ready to connect a tracker.
 
 ## Connect a tracker
 
-Norma reads credentials from environment variables. Set them in your shell (or a `.env`
-you source) before running `norma init`.
+You have three ways to give Norma a credential, in order of convenience:
+
+1. **Let `norma init` ask.** If the credential isn't set, the wizard prompts for it
+   (masked), uses it immediately, and offers to **save it to a gitignored `.env`**.
+2. **A `.env` file** in the project root — Norma **auto-loads `.env` / `.env.local`** on
+   every command, so you set it once.
+3. **Environment variables** — exported in your shell (these always win over `.env`).
+
+The variables below are what each tracker uses; you can export them, put them in `.env`,
+or just let `init` prompt you.
 
 ### Linear
 
@@ -155,7 +163,7 @@ runs, make sure the runtime's CLI is installed and authenticated on your machine
 |---|---|
 | `norma: command not found` | Ensure your global npm bin is on `PATH` (`npm bin -g`); reopen the shell. |
 | `node: unsupported engine` | Upgrade to Node 20+ (`nvm install 20`). |
-| `init` can't connect | Check the env vars above are exported **in the same shell**; re-run `norma doctor`. |
+| `init` can't connect | Let `init` prompt for the key, or check the credential is in `.env` / exported **in the same shell**; re-run `norma doctor`. |
 | Jira: missing statuses | Add the statuses `init` listed to the project's workflow (admin), then re-run `doctor`. |
 | Cards don't move | Run `norma plan <id>` (read-only) to see what the engine would do and why it's blocked. |
 
