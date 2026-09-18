@@ -105,7 +105,26 @@ async function runPlanner(flags: EpicFlags, r: ResolvedConfig) {
     worktree: flags.worktree ?? r.root,
   });
   if (outcome.verdict !== "ok") {
-    throw new Error(`planner did not complete (verdict=${outcome.verdict}): ${outcome.summary}`);
+    const tail = (outcome.raw ?? "").trim().slice(-1200);
+    console.error(`\n✗ planner did not complete (verdict=${outcome.verdict}).`);
+    if (tail) {
+      console.error("\n── agent output (tail) ─────────────────────────────");
+      console.error(tail);
+      console.error("────────────────────────────────────────────────────");
+    }
+    console.error(
+      "\nTips: give a tighter, single-goal brief; or skip the planner and pass a\n" +
+        "deterministic plan with `norma epic --plan-file <plan.json>`.",
+    );
+    process.exit(1);
   }
-  return parseEpicPlan(JSON.parse(await readFile(outPath, "utf8")));
+  let raw: string;
+  try {
+    raw = await readFile(outPath, "utf8");
+  } catch {
+    throw new Error(
+      `planner reported ok but wrote no plan at ${outPath}. Re-run, or use --plan-file.`,
+    );
+  }
+  return parseEpicPlan(JSON.parse(raw));
 }

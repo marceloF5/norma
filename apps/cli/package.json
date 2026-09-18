@@ -1,6 +1,6 @@
 {
   "name": "@norma-team/cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Norma — provider-agnostic orchestration for AI agent pipelines (CLI).",
   "type": "module",
   "license": "MIT",
@@ -32,7 +32,10 @@
   "bin": {
     "norma": "dist/index.js"
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
