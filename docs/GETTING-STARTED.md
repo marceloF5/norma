@@ -2,6 +2,18 @@
 
 From zero to watching an epic run. ~5 minutes.
 
+The path from a fresh clone to a shipped epic, and the cycle loop that runs
+until every task is done:
+
+```mermaid
+flowchart TD
+  A[Install] --> B[norma init]
+  B --> C[norma epic]
+  C --> D[norma cycle]
+  D -->|not a fixed point| D
+  D -->|all released| E[Ship: report, PR, complete]
+```
+
 ## 1. Prerequisites
 
 - **Node ≥ 20** and **pnpm 9** (`corepack enable` provides pnpm).

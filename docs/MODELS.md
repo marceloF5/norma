@@ -11,6 +11,17 @@ resolves the provider and makes the call.
 
 > Selecting a model ≠ accessing a model. Norma selects; the runtime accesses.
 
+```mermaid
+flowchart LR
+  A["Agent frontmatter<br/>model:"] --> N
+  G["Global<br/>runtime.options.model"] --> N
+  N["Norma<br/>selects + forwards selector"] --> R
+  R{"Runtime<br/>resolves + owns auth"} --> CC["Claude Code"]
+  R --> OC["OpenCode"]
+  CC --> P["Provider / model API"]
+  OC --> P
+```
+
 ## Where a selector can come from
 
 There are two places to set one. The more specific wins.

@@ -14,6 +14,34 @@ orchestrator](WHY-DETERMINISTIC.md) earns its keep: a team's process *is* a set 
 rules. Encoding those rules is natural — you are not inventing policy, you are automating
 the one your squad already follows.
 
+## The squad at a glance
+
+The picture is the fastest way to internalize it: a task flows across the board, and at
+each stage a fixed role does its part — just like a real squad pulling work through
+columns.
+
+```mermaid
+flowchart LR
+    backlog[backlog] --> ready[ready]
+    ready --> in_progress[in_progress]
+    in_progress --> needs_review[needs_review]
+    needs_review -->|bounce| needs_rework[needs_rework]
+    needs_rework --> in_progress
+    needs_review -->|approve| needs_qa[needs_qa]
+    needs_qa --> released[released]
+    released --> done[done]
+
+    planner([planner]) -.-> ready
+    worker([worker]) -.-> in_progress
+    reviewer([reviewer]) -.-> needs_review
+    qa([qa]) -.-> needs_qa
+    principal([principal]) -.-> needs_rework
+```
+
+Solid arrows are the board's phase transitions; dashed arrows show which role acts at
+each stage. The `principal` only steps in on escalation — after N bounces, the rework
+loop stops and a lead is raised.
+
 ## The squad → Norma mapping
 
 | Engineering squad / Agile–Kanban | Norma equivalent |
@@ -51,6 +79,20 @@ This is also why parallelism in Norma looks different from a fleet cockpit like 
 Orca runs **many agents on the same task** so a human can compare; Norma runs agents on
 **different tasks across the DAG**, bounded by the WIP limit — exactly how a squad
 parallelizes across a board.
+
+## A concrete walk-through
+
+Say the board holds three tasks: `A` (add an endpoint), `B` (write its client), and
+`C` (docs), where `B` depends on `A`. With a WIP limit of 1 per lane, a cycle plays out
+like a squad would run it:
+
+- `A` and `C` are `ready` (no deps); `B` waits — its dep `A` is not `released` yet.
+- The engine pulls `A` into `in_progress` (a `worker` picks it up). The lane is now full,
+  so `C` stays put — the WIP gate holds.
+- `A` finishes → `needs_review`. The `reviewer` bounces it once → `needs_rework`, a
+  `worker` fixes it, and on the second pass it is approved → `needs_qa` → `released`.
+- `A` being `released` promotes `B` to `ready`. Next cycle the engine pulls `B` (and `C`,
+  in its own lane) forward — no standup required, the board *is* the status.
 
 ## What Norma keeps from agile — and what it drops
 

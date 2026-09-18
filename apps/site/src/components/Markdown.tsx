@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { ArchitectureDiagram } from "@/components/docs/ArchitectureDiagram";
 import { Callout } from "@/components/docs/Callout";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { Mermaid } from "@/components/docs/Mermaid";
 import { PhaseFlow } from "@/components/docs/PhaseFlow";
 import { mdHrefToRoute } from "@/docs";
 import { slugifyHeading } from "@/lib/utils";
@@ -57,6 +58,8 @@ export function Markdown({ children }: { children: string }) {
             const cls: string = codeEl?.props?.className ?? "";
             const lang = /language-(\w+)/.exec(cls)?.[1];
             const code = toText(codeEl?.props?.children);
+            // Mermaid fenced blocks render as SVG diagrams.
+            if (lang === "mermaid") return <Mermaid chart={code} />;
             // Swap key ASCII diagrams for graphical components on the site.
             if (code.includes("computePlan (PURE") && code.includes("adapter-linear")) {
               return <ArchitectureDiagram />;

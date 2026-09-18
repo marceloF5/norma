@@ -6,23 +6,23 @@ decoupled core.
 
 ## Layers (ports & adapters)
 
-```
-                 ┌──────────────────────────────────────────────┐
-                 │  @norma/core — computePlan (PURE, tested)   │
-                 │  Phase model · intents · DAG · gates          │
-                 └───────────────▲───────────────▲──────────────┘
-                                 │ normalized     │ intents
-                                 │ tasks          │
-        ┌────────────────────────┴───────┐   ┌────┴───────────────────────┐
-        │  @norma/tracker (port +       │   │  @norma/orchestrator      │
-        │  normalizer + memory adapter)   │◄──┤  the operator loop          │
-        └───▲───────────────▲─────────────┘   └───▲───────────────▲────────┘
-            │               │                     │               │
-   adapter-linear     adapter-jira        agent-runtime      context store
-   (GraphQL)          (REST)              (claude-code|echo) (brief/PLAN/report)
-                                 ▲
-                                 │ config (Zod): roles · policy · phaseMapping
-                          @norma/config (software-dev preset)
+```mermaid
+flowchart TB
+  core["@norma/core — computePlan<br/>PURE · tested · Phase · intents · DAG · gates"]
+  tracker["@norma/tracker<br/>port + normalizer + memory adapter"]
+  orch["@norma/orchestrator<br/>the operator loop"]
+  config["@norma/config (Zod)<br/>roles · policy · phaseMapping"]
+
+  tracker -->|normalized tasks| core
+  core -->|intents| orch
+  orch -->|reads / writes| tracker
+  config -.->|injected policy| core
+
+  linear["adapter-linear · GraphQL"] --> tracker
+  jira["adapter-jira · REST"] --> tracker
+  github["adapter-github · Issues"] --> tracker
+  runtime["agent-runtime<br/>claude-code · opencode · command · human · echo"] --> orch
+  ctx["context store<br/>brief / PLAN / report"] --> orch
 ```
 
 The engine sees only **normalized tasks** and emits only **abstract intents**. It has no
@@ -59,9 +59,13 @@ runner) is tested in `packages/orchestrator/src/orchestrator.test.ts`.
 
 The engine reasons over provider-agnostic **phases**, never a tracker's state names:
 
-```
-backlog → ready → in_progress → needs_review → needs_qa → released → done
-                        ↑______ needs_rework ______|         (canceled = side exit)
+```mermaid
+flowchart LR
+  backlog --> ready --> in_progress --> needs_review --> needs_qa --> released --> done
+  needs_review -.->|changes requested| needs_rework
+  needs_qa -.->|QA bounce| needs_rework
+  needs_rework --> in_progress
+  in_progress -.->|side exit| canceled
 ```
 
 Each adapter's **normalizer** maps a raw issue `(state, labels)` onto one phase — and a

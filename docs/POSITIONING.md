@@ -16,6 +16,31 @@ The orchestrator is just the operator: it reads the tracker, asks the engine, ru
 specialist agent for each intent, and writes the result back. **The LLM never decides
 _what_ happens next — only _how_ to implement/review/test one task.**
 
+## Where Norma sits
+
+Norma is the **orchestrator layer** between your tracker and the agent runtimes. It
+reads state from the tracker, decides the next action with the engine, dispatches the
+right runtime, and writes the result back — and it is **not** the model, **not** the
+agent, and **not** a replacement for your tracker.
+
+```mermaid
+flowchart LR
+    Tracker[Tracker<br/>source of truth] <--> Norma[Norma<br/>flow-decision engine]
+    Norma <--> Runtime[Agent runtimes<br/>Claude Code, echo, ...]
+
+    subgraph out [What Norma is NOT]
+        M[a model provider]
+        A[an agent]
+        T[a tracker replacement]
+    end
+```
+
+**Concrete example:** a task sits in *Ready* in Linear. On the next tick Norma reads it,
+`computePlan` returns `dispatch`, and it runs Claude Code to implement the task. Norma
+writes the branch/PR and the report back to Linear, moving the task to *In Review*. On a
+later tick the engine sees that state and returns the `review` intent — all without a
+human touching the queue.
+
 ## What Norma is
 
 - A **headless orchestration engine** (CLI + cron) for agent pipelines.

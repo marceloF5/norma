@@ -9,6 +9,20 @@ The short version: **when a process is already determined, paying an LLM to re-d
 every step is waste.** Determinism removes that waste and, as a bonus, makes the whole
 pipeline predictable, auditable, and cheap to run unattended.
 
+The seam looks like this — the engine owns the loop, the LLM owns exactly one task at a
+time:
+
+```mermaid
+flowchart LR
+    State["Task board state"] --> Engine["computePlan (pure code)"]
+    Engine -->|"decides next step, same every run"| Plan["Plan: do task N next"]
+    Plan --> LLM["LLM does the work of one task"]
+    LLM -->|"new state"| State
+```
+
+Every trip around that loop, the "what next?" is free and repeatable; only the box where
+creativity actually lives costs tokens.
+
 ## 1. Token economy on already-determined processes
 
 A pipeline like "worker → review → (rework loop) → QA per batch → complete" has a
@@ -105,7 +119,18 @@ overhead Norma removes is `100%` of `N × D × c`.
 ## 2. Predictability — same input, same plan
 
 `computePlan` is a pure function. Given the same task state, it returns the same plan,
-every time. That means:
+every time. Concretely, a run of it looks like this (illustrative):
+
+```
+computePlan(tasks):
+
+  in:  [ { id: 1, phase: "review", status: "done" },
+         { id: 2, phase: "worker", status: "blocked-by: 1" } ]
+
+  out: [ { task: 2, action: "dispatch" } ]   ← task 1 cleared the gate
+```
+
+Feed it the same board and you get the same `out`, run after run. That means:
 
 - No run-to-run drift in *what* the pipeline does.
 - No "the model decided differently today" surprises.

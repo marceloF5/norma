@@ -1,129 +1,96 @@
 # Norma
 
-**Norma turns a described piece of work into reviewed, verified, done work — with AI
-agents doing the work and a deterministic engine deciding what happens next.**
+**Describe a piece of work. Norma breaks it into tasks, runs AI agents through your
+team's real workflow — build → review → QA → done — and moves the cards on your own board.**
 
-You describe an epic. Norma breaks it into tasks with dependencies, then drives each one
-through your team's real workflow — build → review → QA → done — using agents for the
-creative steps. Your issue tracker (Linear, Jira, GitHub) stays the source of truth, so
-you watch it all happen on the board you already use.
+## What it solves
 
+AI coding agents are great at *one task*. They're unreliable at *orchestration*: which
+task is next, what's blocked, when something is ready for review, when it's truly done.
+Norma splits those jobs. A **pure, tested engine** decides orchestration; the **LLM only
+does the creative work of one task at a time**. Your issue tracker (Linear, Jira, GitHub)
+stays the source of truth, so you watch the whole thing happen on the board you already use.
+
+```mermaid
+flowchart LR
+  A[describe an epic] --> B[tasks + dependency graph<br/>on your board]
+  B --> C{norma cycle}
+  C --> D[build]
+  D --> E[review]
+  E --> F[QA]
+  F -->|pass| G[released → done]
+  E -->|changes| D
+  F -->|bounce| D
+  G --> H[report → ship]
 ```
- describe an epic ──► tasks on your board (with a dependency graph)
-        │
-        ▼   norma cycle  (on demand or on a schedule)
-   build ──► review ──► QA        (agents; humans optional at any step)
-        ↑______ rework ______|
-        ▼
-   all done ──► report ──► ship
-```
 
-The one idea that makes it reliable: **a pure, tested engine decides orchestration; an
-LLM only does the creative work of one task at a time.** The engine enforces the
-dependency graph, the "one task in flight per lane" rule, and the QA gates — the same way
-every run. → [why deterministic](docs/WHY-DETERMINISTIC.md) ·
-[how it works](docs/ARCHITECTURE.md) · [the squad mental model](docs/AGILE-MAPPING.md) ·
-[what Norma is *not*](docs/POSITIONING.md)
+The engine enforces the dependency graph, the "one task in flight per lane" rule, and the
+QA gates — the same way every run. → [why deterministic](docs/WHY-DETERMINISTIC.md)
 
-## Try it in 30 seconds
+## Example
 
-No credentials needed — this runs the whole loop against an in-memory board:
+No credentials, no setup — run the whole loop against an in-memory board:
 
 ```bash
-pnpm install
-pnpm build
-pnpm --filter @norma-team/cli exec tsx src/index.ts demo
+npm i -g @norma-team/cli
+norma demo
 ```
 
-## Set it up on your project
+```text
+promote DEMO-1 → ready
+dispatch DEMO-1 → api-engineer
+review DEMO-1
+qa qa-batch:1 (1 tasks)
+…
+epic complete — all tasks released
+```
 
-One interactive command connects to your tracker, reads your **real board columns**, and
-generates everything Norma needs:
+Then point it at your real tracker:
 
 ```bash
-export LINEAR_API_KEY=lin_api_xxx     # or Jira / GitHub credentials
+export LINEAR_API_KEY=lin_api_xxx            # or Jira / GitHub credentials
 cd your-project
-norma init
-```
-
-It writes `norma.config.json` (how your board maps to Norma's workflow) and
-`.norma/agents/*.md` (your agents, editable Markdown) — and offers to create any missing
-board columns/labels. Prefer non-interactive? `norma init --yes --tracker linear
---team Acme --workers api,web`.
-
-Then plan an epic and let it run:
-
-```bash
+norma init                                   # reads your board, maps columns, writes config
 norma epic --brief "Add referral tiers to the product"   # → tasks + graph on your board
-norma cycle <projectId> --slug referral-tiers            # advance one cycle
+norma cycle <projectId> --slug referral-tiers            # advance the epic
+norma serve <projectId>                      # watch it move, live
 ```
 
-## Commands
-
-| Command | What it does |
-|---|---|
-| `norma init` | Onboard a project: map the board, pick agents + runtime, generate config. |
-| `norma epic` | Turn a brief (or a `--plan-file`) into a project + tasks + dependency graph. |
-| `norma cycle <id>` | Advance an epic: plan → run agents → write back, to a fixed point. |
-| `norma status <id>` | The board at a glance (per-task phase/owner/batch). |
-| `norma plan <id>` | Print the engine's next actions — read-only, no writes. |
-| `norma report <id>` | Generate the delivery report (also runs at completion; `cycle --pr` opens a PR). |
-| `norma doctor` | Validate config, credentials, board mapping, and agent files. |
-| `norma agents` · `worktree` · `complete` · `whoami` · `demo` | Manage agents, per-epic git worktrees, finish, verify auth, offline demo. |
-
-Config is auto-discovered from `norma.config.json`; point elsewhere with `--config`.
-
-## Watch it live
+## Install
 
 ```bash
-norma serve --demo        # offline: seeded epic + echo agents, open http://localhost:4680
-norma serve <projectId>   # against your tracker
+npm i -g @norma-team/cli        # provides the `norma` command
 ```
 
-A live dashboard lays your tasks out in columns by phase and **animates them as the
-epic runs** — highlighting what's in flight and what's next. `norma serve` ships a
-zero-dependency page; `apps/web` is the richer client (React + shadcn/ui + TanStack)
-that talks to the same API.
+Requires **Node 20+**. Full requirements, per-tracker credential setup, and troubleshooting:
+→ **[Installation guide](docs/INSTALLATION.md)**.
+
+## Documentation
+
+| Doc | What's inside |
+|---|---|
+| **[Installation](docs/INSTALLATION.md)** | Requirements, install methods, credentials per tracker, verification. |
+| **[Getting started](docs/GETTING-STARTED.md)** | Install → init → epic → cycle → ship, end to end. |
+| [Architecture](docs/ARCHITECTURE.md) | The engine, the phase model, packages, ports & adapters. |
+| [Why deterministic](docs/WHY-DETERMINISTIC.md) | Why a pure engine drives orchestration and the LLM doesn't. |
+| [Model selection](docs/MODELS.md) | Norma selects the model; the runtime accesses it. |
+| [Agile mapping](docs/AGILE-MAPPING.md) | The engineering-squad mental model. |
+| [Positioning](docs/POSITIONING.md) | What Norma is — and isn't. |
+| [Validation](docs/VALIDATION.md) | Live-API status per adapter. |
+
+Full index: [docs/](docs/README.md).
 
 ## Works with your stack
 
 - **Trackers:** Linear · Jira · GitHub Issues · in-memory (offline). Adding one is an
   adapter + a mapping — no engine change.
 - **Agent runtimes:** Claude Code · OpenCode (multi-provider) · any command/script ·
-  humans (review/QA by comment) · echo (offline). The agent *definition* is separate from
-  *how it runs*, so switching runtimes touches nothing else. Norma *selects* the model;
-  the runtime *accesses* it → [model selection](docs/MODELS.md).
+  humans (review/QA by comment) · echo (offline). Norma *selects* the model; the runtime
+  *accesses* it → [model selection](docs/MODELS.md).
 - **Pipelines:** ships a `software-dev` preset (and `content`, `github`); write your own
   as config.
 
-## Install the CLI globally
-
-`@norma-team/cli` is published to npm as a self-contained binary (the whole workspace
-bundled in) — install it and you get the `norma` command:
-
-```bash
-npm i -g @norma-team/cli
-```
-
-## Docs
-
-- **[Getting started](docs/GETTING-STARTED.md)** — install → init → epic → cycle → ship.
-- [Architecture](docs/ARCHITECTURE.md) — the engine, the phase model, packages, and the
-  mapping from the original harness.
-- [Why deterministic](docs/WHY-DETERMINISTIC.md) · [Model selection](docs/MODELS.md) ·
-  [Agile mapping](docs/AGILE-MAPPING.md) · [Positioning](docs/POSITIONING.md) ·
-  [Live validation](docs/VALIDATION.md)
-- Full index: [docs/](docs/README.md). Autonomous runs (cron + sandbox): see `tooling/`.
-
-## Apps
-
-- `apps/cli` — the `norma` command.
-- `apps/web` — the live dashboard (React + shadcn/ui + TanStack), served by `norma serve`.
-- `apps/site` — the product/landing site (**norma.team**).
-
 ## Status
 
-Extracted and generalized from a working autonomous dev harness. 14 packages, ~84 tests,
-CI green. Published to npm as `@norma-team/cli`. GitHub, **Linear, and Jira are all
-validated end-to-end against live APIs** — connect, introspect, provision, create, and run
-a full cycle (see [validation](docs/VALIDATION.md)).
+Published to npm as `@norma-team/cli`. 14 packages, ~84 tests, CI green. **GitHub, Linear,
+and Jira are validated end-to-end against live APIs** (see [validation](docs/VALIDATION.md)).

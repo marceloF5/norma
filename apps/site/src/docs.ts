@@ -3,6 +3,7 @@
 import agileMapping from "../../../docs/AGILE-MAPPING.md?raw";
 import architecture from "../../../docs/ARCHITECTURE.md?raw";
 import gettingStarted from "../../../docs/GETTING-STARTED.md?raw";
+import installation from "../../../docs/INSTALLATION.md?raw";
 import models from "../../../docs/MODELS.md?raw";
 import positioning from "../../../docs/POSITIONING.md?raw";
 import validation from "../../../docs/VALIDATION.md?raw";
@@ -16,6 +17,7 @@ export interface Doc {
 }
 
 export const DOCS: Doc[] = [
+  { slug: "installation", title: "Installation", blurb: "Requirements, install methods, credentials per tracker, verification.", content: installation },
   { slug: "getting-started", title: "Getting started", blurb: "Install → init → epic → cycle → ship.", content: gettingStarted },
   { slug: "architecture", title: "Architecture", blurb: "The engine, phases, and packages.", content: architecture },
   { slug: "why-deterministic", title: "Why deterministic", blurb: "Why a pure engine drives orchestration.", content: whyDeterministic },
@@ -32,6 +34,7 @@ export function mdHrefToRoute(href: string): string | null {
   const file = href.split("/").pop() ?? href;
   const base = file.replace(/\.md$/i, "").toUpperCase();
   const map: Record<string, string> = {
+    INSTALLATION: "installation",
     "GETTING-STARTED": "getting-started",
     ARCHITECTURE: "architecture",
     "WHY-DETERMINISTIC": "why-deterministic",
